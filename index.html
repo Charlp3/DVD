@@ -3,9 +3,9 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-<title>DVD — Gestion simple (CSV)</title>
+<title>DVD — Gestion CSV</title>
 <meta name="theme-color" content="#1450A3">
-<link rel="icon" id="favicon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0' y1='0' x2='1' y2='1'%3E%3Cstop offset='0' stop-color='%230B3A7A'/%3E%3Cstop offset='1' stop-color='%232563EB'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='64' height='64' fill='url(%23g)'/%3E%3Ccircle cx='22' cy='32' r='12' fill='%23fff'/%3E%3Ccircle cx='22' cy='32' r='3' fill='url(%23g)'/%3E%3Crect x='34' y='16' width='20' height='4' rx='2' fill='%23fff' opacity='.7'/%3E%3Ccircle cx='45' cy='18' r='3' fill='%23fff'/%3E%3Crect x='34' y='30' width='20' height='4' rx='2' fill='%23fff' opacity='.7'/%3E%3Ccircle cx='38' cy='32' r='3' fill='%23fff'/%3E%3Crect x='34' y='44' width='20' height='4' rx='2' fill='%23fff' opacity='.7'/%3E%3Ccircle cx='52' cy='46' r='3' fill='%23fff'/%3E%3C/svg%3E">
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0' y1='0' x2='1' y2='1'%3E%3Cstop offset='0' stop-color='%230B3A7A'/%3E%3Cstop offset='1' stop-color='%232563EB'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='64' height='64' fill='url(%23g)'/%3E%3Ccircle cx='22' cy='32' r='12' fill='%23fff'/%3E%3Ccircle cx='22' cy='32' r='3' fill='url(%23g)'/%3E%3Crect x='34' y='16' width='20' height='4' rx='2' fill='%23fff' opacity='.7'/%3E%3Ccircle cx='45' cy='18' r='3' fill='%23fff'/%3E%3Crect x='34' y='30' width='20' height='4' rx='2' fill='%23fff' opacity='.7'/%3E%3Ccircle cx='38' cy='32' r='3' fill='%23fff'/%3E%3Crect x='34' y='44' width='20' height='4' rx='2' fill='%23fff' opacity='.7'/%3E%3Ccircle cx='52' cy='46' r='3' fill='%23fff'/%3E%3C/svg%3E">
 <style>
   :root{
     --bg:#0f172a; --panel:#0b2847; --panel-2:#123a6b;
@@ -24,25 +24,18 @@
     border-bottom:1px solid rgba(96,165,250,.25);
   }
   .wrap{max-width:1200px; margin:0 auto; padding:12px 16px;}
-  .brand{display:flex; align-items:center; gap:.8rem}
-  .logo{
-    width:36px; height:36px; border-radius:8px; flex:0 0 36px; overflow:hidden;
-    background:#1450A3; border:1px solid rgba(96,165,250,.35); box-shadow:var(--shadow)
-  }
-  .logo img{width:100%; height:100%; object-fit:cover; display:block}
-  h1{font-size:20px; margin:0; display:flex; gap:.6rem; align-items:center;}
-  h1 .badge{font-size:12px; color:#cfe3ff; padding:.2rem .5rem; border-radius:999px; background:rgba(96,165,250,.15); border:1px solid rgba(96,165,250,.35)}
+  h1{font-size:20px; margin:0; font-weight:700}
   .toolbar{display:flex; flex-wrap:wrap; gap:.5rem; margin-top:10px}
   .btn{
     appearance:none; border:1px solid rgba(96,165,250,.35); color:#eaf2ff;
     background:linear-gradient(180deg, rgba(59,130,246,.18), rgba(59,130,246,.08));
     padding:.55rem .8rem; border-radius:10px; cursor:pointer; transition:.2s transform, .2s background, .2s border;
-    display:inline-flex; align-items:center; gap:.5rem; box-shadow: var(--shadow)
+    display:inline-flex; align-items:center; gap:.5rem; box-shadow: var(--shadow);
+    text-decoration:none;
   }
   .btn:hover{transform:translateY(-1px); background:linear-gradient(180deg, rgba(59,130,246,.22), rgba(59,130,246,.1))}
   .btn.secondary{background:linear-gradient(180deg, rgba(30,58,138,.35), rgba(30,58,138,.18));}
   .btn.warn{border-color:rgba(245,158,11,.35); background:linear-gradient(180deg, rgba(245,158,11,.18), rgba(245,158,11,.08));}
-  .btn.danger{border-color:rgba(239,68,68,.35); background:linear-gradient(180deg, rgba(239,68,68,.18), rgba(239,68,68,.08));}
   input[type="file"]{display:none}
   .file-label{cursor:pointer}
 
@@ -53,7 +46,7 @@
   }
 
   /* Table */
-  .table-wrap{overflow:auto; max-height: calc(100vh - 360px); border-top:1px solid rgba(96,165,250,.2)}
+  .table-wrap{overflow:auto; max-height: calc(100vh - 320px); border-top:1px solid rgba(96,165,250,.2)}
   table{border-collapse:separate; border-spacing:0; width:100%; min-width:1020px;}
   thead th{
     position:sticky; top:0; z-index:10; background:linear-gradient(180deg, rgba(13,37,78,0.95), rgba(10,29,64,.95));
@@ -61,12 +54,12 @@
     color:#d8e7ff; backdrop-filter: blur(6px);
   }
   thead th .head{ display:flex; align-items:center; gap:.35rem; user-select:none; }
-  thead th .sort{
+  .sort{
     width:20px; height:20px; display:inline-grid; place-items:center; border-radius:6px; cursor:pointer;
     color:var(--muted); transition:.2s background,.2s color; font-size:15px;
   }
-  thead th .sort:hover{background:rgba(59,130,246,.18); color:var(--accent-2)}
-  thead th .filter-toggle{
+  .sort:hover{background:rgba(59,130,246,.18); color:var(--accent-2)}
+  .filter-toggle{
     margin-left:auto; width:22px; height:22px; display:grid; place-items:center; border-radius:6px; cursor:pointer; color:#9ec3ff;
     background:rgba(59,130,246,.15); border:1px solid rgba(59,130,246,.35); font-size:14px;
   }
@@ -85,7 +78,7 @@
   .select-war{width:100%}
   .editable{
     width:100%; background:transparent; border:1px dashed transparent;
-    padding:.22rem .28rem; border-radius:8px; color:var(--text); outline:none;
+    padding:.22rem .28rem; border-radius:8px; color:#eaf2ff; outline:none;
   }
   .editable:focus{border-color:rgba(96,165,250,.6); background:rgba(3,15,35,.65)}
   .num{font-variant-numeric: tabular-nums;}
@@ -112,7 +105,7 @@
   }
   .stats.open{display:grid; animation:slideDown .2s ease-out}
   .card{background:linear-gradient(180deg, rgba(11,40,71,.8), rgba(13,50,94,.7)); border:1px solid rgba(96,165,250,.25); border-radius:12px; box-shadow: var(--shadow);}
-  .card h3{margin:0; padding:10px 12px; font-size:15px; background:rgba(59,130,246,.15); border-bottom:1px solid rgba(96,165,250,.25)}
+  .card h3{margin:0 0 8px; padding:10px 12px; font-size:15px; background:rgba(59,130,246,.15); border-bottom:1px solid rgba(96,165,250,.25)}
   .card .body{padding:10px 12px}
   .metric{display:flex; align-items:center; gap:10px; margin:8px 0}
   .bar{flex:1; background:rgba(59,130,246,.15); border:1px solid rgba(59,130,246,.35); height:12px; border-radius:999px; overflow:hidden;}
@@ -130,10 +123,26 @@
   }
   .notice{margin:12px 0 0; font-size:13px; color:#b8d4ff}
 
+  /* Panneau Paramètres */
+  .settings{position:fixed; right:16px; bottom:16px; z-index:50;}
+  .sheet{
+    position:fixed; right:16px; bottom:72px; width:320px; max-width:92vw;
+    background:linear-gradient(180deg, rgba(11,40,71,.98), rgba(13,50,94,.98));
+    border:1px solid rgba(96,165,250,.35); border-radius:14px; box-shadow:var(--shadow);
+    padding:12px 14px; display:none;
+  }
+  .sheet.open{display:block; animation:slideDown .18s ease-out}
+  .sheet h3{margin:0 0 8px; font-size:15px}
+  .field{display:flex; align-items:center; justify-content:space-between; gap:10px; padding:8px 0}
+  .field label{font-size:14px}
+  .field input[type="checkbox"]{width:18px; height:18px; accent-color:var(--accent)}
+  .sub{font-size:12px; color:#bcd2ff}
+  .small{font-size:12px; color:#cfe3ff}
+
   /* iPhone / petits écrans */
   @media (max-width:480px){
     body{font-size:14px}
-    .table-wrap{max-height: calc(100vh - 320px)}
+    .table-wrap{max-height: calc(100vh - 300px)}
     table{min-width:860px}
   }
 </style>
@@ -141,10 +150,7 @@
 <body>
 <header>
   <div class="wrap">
-    <div class="brand">
-      <div class="logo" id="logoBox"><img id="logoImg" alt="Logo"></div>
-      <h1>🎬 DVD <span class="badge">tri & édition CSV (tons bleus)</span></h1>
-    </div>
+    <h1>DVD — Gestion CSV</h1>
     <div class="toolbar">
       <label class="btn file-label">
         <input id="fileInput" type="file" accept=".csv" />
@@ -153,18 +159,9 @@
       <button class="btn" id="btnExport">⬇️ Exporter CSV</button>
       <button class="btn secondary" id="btnAdd">➕ Ajouter</button>
       <button class="btn" id="btnStats">📊 Statistiques</button>
-
-      <!-- Logo -->
-      <label class="btn file-label">
-        <input id="logoInput" type="file" accept="image/*,.svg" />
-        🖼️ Choisir logo
-      </label>
-      <button class="btn" id="btnLogoClear">♻️ Logo par défaut</button>
-
-      <button class="btn warn" id="btnSave">💾 Sauvegarder</button>
-      <button class="btn danger" id="btnClear">🗑️ Vider (local)</button>
+      <button class="btn warn" id="btnSettings">⚙️ Paramètres</button>
     </div>
-    <p class="notice">Colonne <strong>Nº</strong> figée à gauche (lecture iPhone). Filtres sous les en-têtes. Le logo est mémorisé localement avec la configuration.</p>
+    <p class="notice">Colonne <strong>Nº</strong> figée à gauche (lecture iPhone). Filtres sous les en-têtes. L’appli ne garde pas les données : utilisez <em>Importer/Exporter CSV</em> (backup).</p>
   </div>
 </header>
 
@@ -177,7 +174,7 @@
   </div>
   <div class="footer">
     <div><span id="countShown">0</span> / <span id="countTotal">0</span> éléments</div>
-    <div>© Pierre Charlier 2025</div>
+    <div>© Pierre Charlier 2025 • v<span id="version"></span></div>
   </div>
 </div>
 
@@ -193,12 +190,42 @@
   </div>
 </div>
 
+<!-- Paramètres -->
+<div class="settings">
+  <div class="sheet" id="sheet">
+    <h3>Paramètres</h3>
+    <div class="field">
+      <label for="cbCompact">Mode compact</label>
+      <input type="checkbox" id="cbCompact">
+    </div>
+    <div class="sub">Réduit l’espacement pour voir plus de lignes.</div>
+
+    <div class="field">
+      <label for="cbNarrowNo">Nº très étroit</label>
+      <input type="checkbox" id="cbNarrowNo" checked>
+    </div>
+    <div class="sub">Force la colonne <strong>Nº</strong> à une largeur minimale pour iPhone.</div>
+
+    <div class="field">
+      <label>Version</label>
+      <div class="small">v<span id="ver2"></span></div>
+    </div>
+  </div>
+</div>
+
 <script>
+/* ===========================
+   Version (affichée sous forme vX.Y)
+   =========================== */
+const APP_VERSION = '1.1';
+document.getElementById('version').textContent = APP_VERSION;
+document.getElementById('ver2').textContent = APP_VERSION;
+
 /* ===========================
    Colonnes & configuration
    =========================== */
 const Columns = [
-  { key:'numero',    label:'Nº',         type:'number', width:64,  sortable:true,  filter:'text', sticky:true }, // label court + sticky
+  { key:'numero',    label:'Nº',         type:'number', width:64,  sortable:true,  filter:'text', sticky:true },
   { key:'titre',     label:'Titre',      type:'text',   width:260, sortable:true,  filter:'text' },
   { key:'voyage',    label:'Voyage',     type:'bool',   width:86,  sortable:true,  filter:'tri'  },
   { key:'aviation',  label:'Aviation',   type:'bool',   width:90,  sortable:true,  filter:'tri'  },
@@ -225,14 +252,10 @@ const CsvAliases = {
   'numero':'numero','numéro':'numero','nº':'numero','n°':'numero','#':'numero','id':'numero','no':'numero'
 };
 
-// État + config persistante
+// État (pas de persistance)
 let rows = [];
 let filters = {};
 let sortState = { key:'numero', dir:'asc' };
-let config = {
-  logoDataUrl: null,
-  statsOpen: false
-};
 
 /* ===========================
    CSV helpers
@@ -263,35 +286,14 @@ function toCSV(rows, header){
 }
 
 /* ===========================
-   Local storage
-   =========================== */
-const STORAGE_KEY = 'dvd-csv-grid-v3'; // nouvelle version (logo + config)
-function saveLocal(){
-  localStorage.setItem(STORAGE_KEY, JSON.stringify({rows, sortState, filters, config}));
-  toast('Données & configuration sauvegardées. ✔️');
-}
-function loadLocal(){
-  const raw = localStorage.getItem(STORAGE_KEY);
-  if(!raw) return false;
-  try {
-    const data = JSON.parse(raw);
-    rows = data.rows || [];
-    sortState = data.sortState || sortState;
-    filters = data.filters || {};
-    config = Object.assign(config, data.config || {});
-    return true;
-  } catch { return false; }
-}
-function clearLocal(){
-  localStorage.removeItem(STORAGE_KEY);
-  toast('Stockage local vidé.');
-}
-
-/* ===========================
    Import CSV
    =========================== */
 function normalizeHeader(h){
   return h.trim().toLowerCase().replace(/\s+/g,' ').replace(/\./g,'').replace(/é/g,'e').replace(/º|°/g,'o');
+}
+function parseYesNo(val){
+  const v = String(val).trim().toLowerCase();
+  return ['1','oui','yes','true','vrai','x','✓'].includes(v);
 }
 function importCSV(text){
   const grid = parseCSV(text);
@@ -304,7 +306,7 @@ function importCSV(text){
     if(key && !headerMap[i]) headerMap[i]=key;
   });
 
-  // fusionne "Aviation" dupliquée si présent
+  // fusion "Aviation" dupliquée
   const aviationIdxs = headerRaw.map((h,i)=>({i, norm:normalizeHeader(h)})).filter(x=>x.norm==='aviation').map(x=>x.i);
 
   const body = grid.slice(1);
@@ -337,18 +339,6 @@ function importCSV(text){
 }
 
 /* ===========================
-   Helpers
-   =========================== */
-function parseYesNo(val){
-  const v = String(val).trim().toLowerCase();
-  return ['1','oui','yes','true','vrai','x','✓'].includes(v);
-}
-function setFavicon(dataUrl){
-  const link = document.getElementById('favicon');
-  link.href = dataUrl;
-}
-
-/* ===========================
    Construction de l'entête & table
    =========================== */
 const theadEl = document.getElementById('thead');
@@ -356,9 +346,9 @@ const tbodyEl = document.getElementById('tbody');
 
 function buildHeader(){
   theadEl.innerHTML = '';
-  // Ligne des en-têtes
+  // En-têtes
   const tr1 = document.createElement('tr');
-  Columns.forEach((col, idx)=>{
+  Columns.forEach((col)=>{
     const th = document.createElement('th');
     th.style.width = (col.width||100)+'px';
     if(col.sticky){ th.classList.add('sticky'); }
@@ -382,7 +372,7 @@ function buildHeader(){
   });
   theadEl.appendChild(tr1);
 
-  // Ligne des filtres
+  // Filtres
   const tr2 = document.createElement('tr'); tr2.className='filters';
   Columns.forEach(col=>{
     const th = document.createElement('th');
@@ -459,7 +449,7 @@ function renderBody(view){
   });
   document.getElementById('countShown').textContent = String(view.length);
   document.getElementById('countTotal').textContent = String(rows.length);
-  if(config.statsOpen) renderStats();
+  if(document.getElementById('stats').classList.contains('open')) renderStats();
 }
 
 function toEditor(td, rowIndex, col){
@@ -583,43 +573,24 @@ document.getElementById('btnExport').addEventListener('click', ()=>{
   const url = URL.createObjectURL(blob);
   const a = document.createElement('a'); a.href=url; a.download='dvd.csv'; a.click(); URL.revokeObjectURL(url);
 });
-document.getElementById('btnSave').addEventListener('click', saveLocal);
-document.getElementById('btnClear').addEventListener('click', ()=>{ clearLocal(); rows=[]; filters={}; sortState={key:'numero',dir:'asc'}; config={logoDataUrl:null, statsOpen:false}; applyAndRender(); });
-
 document.getElementById('btnStats').addEventListener('click', ()=>{
   const el = document.getElementById('stats');
   el.classList.toggle('open');
-  config.statsOpen = el.classList.contains('open');
-  if(config.statsOpen) renderStats();
-  saveLocal();
+  if(el.classList.contains('open')) renderStats();
 });
 
-/* ====== Logo (choix + mémoire) ====== */
-const defaultLogoDataUrl = document.getElementById('favicon').href; // le petit SVG intégré
-const logoImg = document.getElementById('logoImg');
-
-function updateLogo(){
-  const src = config.logoDataUrl || defaultLogoDataUrl;
-  logoImg.src = src;
-  setFavicon(src);
-}
-document.getElementById('logoInput').addEventListener('change', async (e)=>{
-  const f = e.target.files?.[0]; if(!f) return;
-  // lecture en DataURL (PNG/JPG/SVG…)
-  const reader = new FileReader();
-  reader.onload = ()=>{
-    config.logoDataUrl = reader.result;
-    updateLogo();
-    saveLocal();
-    toast('Logo enregistré. ✔️');
-  };
-  reader.readAsDataURL(f);
+/* ====== Paramètres (panneau) ====== */
+const btnSettings = document.getElementById('btnSettings');
+const sheet = document.getElementById('sheet');
+btnSettings.addEventListener('click', ()=>{ sheet.classList.toggle('open'); });
+document.getElementById('cbCompact').addEventListener('change', e=>{
+  document.body.style.setProperty('font-size', e.target.checked ? '14px' : '15px');
+  document.querySelectorAll('.editable').forEach(el=> el.style.padding = e.target.checked ? '.18rem .24rem' : '.22rem .28rem');
 });
-document.getElementById('btnLogoClear').addEventListener('click', ()=>{
-  config.logoDataUrl = null;
-  updateLogo();
-  saveLocal();
-  toast('Logo réinitialisé.');
+document.getElementById('cbNarrowNo').addEventListener('change', e=>{
+  const noCol = Columns.find(c=>c.key==='numero');
+  noCol.width = e.target.checked ? 64 : 90;
+  applyAndRender(true);
 });
 
 /* ===========================
@@ -681,7 +652,7 @@ function renderStats(){
 }
 
 /* ===========================
-   Toast
+   Toast minimal
    =========================== */
 let toastTimer=null;
 function toast(msg, type='info'){
@@ -703,25 +674,16 @@ function toast(msg, type='info'){
 }
 
 /* ===========================
-   Démarrage
+   Démarrage (3 lignes de démo)
    =========================== */
 (function init(){
-  const ok = loadLocal();
   buildHeader();
-  if(ok){
-    updateLogo();
-    if(config.statsOpen){ document.getElementById('stats').classList.add('open'); renderStats(); }
-    applyAndRender();
-  } else {
-    // Démo
-    rows = [
-      { numero:'1',  titre:'Le Voyage de Chihiro', voyage:true, aviation:false, animation:true,  aventure:true,  sf:false, explor:false, guerre:'',    animaux:true,  disney:false, horreur:false, enfants:true,  famille:true,  histoire:false, autres:false, nomcle:'Miyazaki' },
-      { numero:'2',  titre:'Dunkerque',            voyage:false,aviation:true,  animation:false, aventure:false, sf:false, explor:false, guerre:'WW2', animaux:false, disney:false, horreur:false, enfants:false, famille:false, histoire:true,  autres:false, nomcle:'Christopher Nolan' },
-      { numero:'42', titre:'Interstellar',         voyage:false,aviation:false, animation:false, aventure:true,  sf:true,  explor:true,  guerre:'',    animaux:false, disney:false, horreur:false, enfants:false, famille:false, histoire:false,autres:false, nomcle:'Matthew McConaughey; Nolan' }
-    ];
-    updateLogo();
-    applyAndRender();
-  }
+  rows = [
+    { numero:'1',  titre:'Le Voyage de Chihiro', voyage:true, aviation:false, animation:true,  aventure:true,  sf:false, explor:false, guerre:'',    animaux:true,  disney:false, horreur:false, enfants:true,  famille:true,  histoire:false, autres:false, nomcle:'Miyazaki' },
+    { numero:'2',  titre:'Dunkerque',            voyage:false,aviation:true,  animation:false, aventure:false, sf:false, explor:false, guerre:'WW2', animaux:false, disney:false, horreur:false, enfants:false, famille:false, histoire:true,  autres:false, nomcle:'Christopher Nolan' },
+    { numero:'42', titre:'Interstellar',         voyage:false,aviation:false, animation:false, aventure:true,  sf:true,  explor:true,  guerre:'',    animaux:false, disney:false, horreur:false, enfants:false, famille:false, histoire:false,autres:false, nomcle:'Matthew McConaughey; Nolan' }
+  ];
+  applyAndRender();
 })();
 </script>
 </body>
