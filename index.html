@@ -18,13 +18,24 @@
   header{position:sticky;top:0;z-index:20;background:linear-gradient(180deg,#fffbea,#f3e9b5);border-bottom:1px solid var(--border);box-shadow:0 2px 5px rgba(0,0,0,.05);}
   .wrap{max-width:1200px;margin:0 auto;padding:12px 16px;}
   h1{font-size:20px;margin:0;font-weight:700;color:#3a2e0a;}
-  .toolbar{display:flex;flex-wrap:wrap;gap:.5rem;margin-top:10px;}
-  .btn{appearance:none;border:1px solid rgba(22,163,74,.4);background:linear-gradient(180deg,rgba(34,197,94,.25),rgba(22,163,74,.15));color:#084c24;font-weight:600;padding:.55rem .8rem;border-radius:8px;cursor:pointer;transition:.2s transform,.2s background;box-shadow:var(--shadow);}
+  .toolbar{display:flex;flex-wrap:wrap;gap:.5rem;margin-top:10px;align-items:center}
+  .btn{
+    appearance:none;border:1px solid rgba(22,163,74,.4);
+    background:linear-gradient(180deg,rgba(34,197,94,.25),rgba(22,163,74,.15));
+    color:#084c24;font-weight:600;padding:.55rem .8rem;border-radius:8px;cursor:pointer;
+    transition:.2s transform,.2s background;box-shadow:var(--shadow);
+  }
   .btn:hover{transform:translateY(-1px);background:linear-gradient(180deg,rgba(34,197,94,.35),rgba(22,163,74,.25));}
   .btn.secondary{border:1px solid #d6b54a;background:linear-gradient(180deg,#fff1b8,#f9e58a);color:#3a2e0a;}
   .btn.warn{border:1px solid #facc15;background:linear-gradient(180deg,#fff9c4,#fae46c);color:#3a2e0a;}
   .btn.danger{border:1px solid #f87171;background:linear-gradient(180deg,#ffe4e6,#fecaca);color:#7f1d1d;}
   input[type="file"]{display:none}
+  .filters{display:flex;gap:.35rem;align-items:center;margin-left:auto}
+  .chipbtn{border:1px solid #e5d58e;background:#fff7cf;color:#5f4f19;padding:.35rem .6rem;border-radius:999px;cursor:pointer;font-weight:600}
+  .chipbtn.active{border-color:#b79a2e;background:#ffe98a}
+  .chipbtn[data-v="WW1"]{background:#eaf4ff;border-color:#b9d6ff}
+  .chipbtn[data-v="WW2"]{background:#eef6d3;border-color:#cfe7a5}
+  .chipbtn[data-v="Autres"]{background:#f2f2f2;border-color:#dedede}
 
   .panel{margin:12px auto;background:var(--panel);border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow);}
   .table-wrap{overflow:auto;max-height:calc(100vh - 320px);border-top:1px solid var(--border)}
@@ -35,11 +46,17 @@
   tbody td{border-bottom:1px solid #efe3b5;padding:.4rem .5rem;vertical-align:middle;}
   tbody tr:hover td{background:#fffbe1;}
   th.sticky,td.sticky{position:sticky;left:0;z-index:15;background:#fffce6;border-right:1px solid var(--border);}
-  .boolean input[type="checkbox"]{width:18px;height:18px;accent-color:var(--accent);}
-  .num{font-variant-numeric:tabular-nums;}
   .row-actions{display:flex;gap:.35rem;justify-content:flex-end}
   .icon-btn{border:1px solid rgba(22,163,74,.4);color:#0b4f27;background:linear-gradient(180deg,rgba(34,197,94,.2),rgba(22,163,74,.12));width:30px;height:30px;border-radius:8px;cursor:pointer;}
   .icon-btn:hover{background:linear-gradient(180deg,rgba(34,197,94,.3),rgba(22,163,74,.2))}
+  .boolean input[type="checkbox"]{width:18px;height:18px;accent-color:var(--accent);}
+  .num{font-variant-numeric:tabular-nums;}
+
+  /* Pastilles Guerre */
+  .badge{display:inline-block;padding:.15rem .45rem;border-radius:999px;font-size:12px;border:1px solid transparent}
+  .badge-ww1{background:#eaf4ff;border-color:#b9d6ff;color:#113a74}
+  .badge-ww2{background:#eef6d3;border-color:#cfe7a5;color:#3c4b1f}
+  .badge-autres{background:#f2f2f2;border-color:#dedede;color:#4b5563}
 
   .footer{display:flex;justify-content:space-between;align-items:center;padding:10px 14px;font-size:14px;color:#4b3f16;background:#fff9d3;border-top:1px solid var(--border);}
   .stats{display:none;grid-template-columns:1fr 1fr;gap:16px;margin:10px auto 0;max-width:1200px;padding:0 16px 16px;}
@@ -64,7 +81,6 @@
   .field label{font-size:14px;}
   .field input[type="checkbox"]{width:18px;height:18px;accent-color:var(--accent);}
   .sub{font-size:12px;color:#7c6a28;}
-  .help{margin:10px 0 0;font-size:13px;color:#6b5a1d;background:#fff8dc;border:1px solid var(--border);padding:.6rem .7rem;border-radius:8px;}
 
   #toast{position:fixed;left:50%;bottom:18px;transform:translateX(-50%);background:#f0fdf4;color:#14532d;border:1px solid #86efac;padding:10px 14px;border-radius:8px;box-shadow:var(--shadow);opacity:0;transition:opacity .2s ease;z-index:9999;}
   #toast.show{opacity:1;}
@@ -77,12 +93,21 @@
   <div class="wrap">
     <h1>DVD — Gestion CSV</h1>
     <div class="toolbar">
-      <label class="btn" for="fileInput" id="labelImport">⬆️ Importer CSV</label>
+      <label class="btn" for="fileInput">📂 Importer CSV</label>
       <input id="fileInput" type="file" accept=".csv" />
       <button class="btn secondary" id="btnAdd" type="button">➕ Ajouter</button>
       <button class="btn danger" id="btnClearAll" type="button">🗑️ Tout effacer</button>
       <button class="btn" id="btnStats" type="button">📊 Statistiques</button>
       <button class="btn warn" id="btnSettings" type="button">⚙️ Paramètres</button>
+
+      <!-- Filtres rapides Guerre -->
+      <div class="filters" id="guerreFilters" aria-label="Filtre Guerre">
+        <button class="chipbtn active" data-v="ALL" type="button">Tous</button>
+        <button class="chipbtn" data-v="WW1" type="button">WW1</button>
+        <button class="chipbtn" data-v="WW2" type="button">WW2</button>
+        <button class="chipbtn" data-v="Autres" type="button">Autres</button>
+        <button class="chipbtn" data-v="(vide)" type="button">(vide)</button>
+      </div>
     </div>
   </div>
 </header>
@@ -100,6 +125,7 @@
   </div>
 </div>
 
+<!-- Statistiques -->
 <div class="stats" id="stats">
   <div class="card">
     <h3>Répartition des thèmes (Oui)</h3>
@@ -111,6 +137,7 @@
   </div>
 </div>
 
+<!-- Paramètres -->
 <div class="settings">
   <div class="sheet" id="sheet">
     <h3>⚙️ Paramètres</h3>
@@ -130,14 +157,6 @@
       <label>Version</label>
       <span>v<span id="ver2"></span></span>
     </div>
-
-    <div class="help">
-      <strong>Aide & infos :</strong><br>
-      • Colonne <b>Nº</b> figée à gauche (lecture iPhone).<br>
-      • Cliquez sur un en-tête pour <b>trier</b> (▲/▼).<br>
-      • L’application ne garde pas les données : utilisez <i>Importer CSV</i> pour recharger depuis votre fichier principal.<br>
-      • Les colonnes vides sont lues comme <i>Non</i>. <b>Guerre</b> : WW1 / WW2 / Autres (ou vide).
-    </div>
   </div>
 </div>
 
@@ -145,7 +164,7 @@
 
 <script>
 document.addEventListener('DOMContentLoaded', () => {
-  const APP_VERSION='1.9';
+  const APP_VERSION='2.0';
   byId('version').textContent=APP_VERSION;
   byId('ver2').textContent=APP_VERSION;
 
@@ -172,11 +191,12 @@ document.addEventListener('DOMContentLoaded', () => {
 
   let rows=[];
   let sortState={ key:'numero', dir:'asc' };
+  let guerreFilter='ALL';
 
   const thead=byId('thead');
   const tbody=byId('tbody');
 
-  // Entête + tri
+  /* ===== Entête + tri ===== */
   function buildHeader(){
     thead.innerHTML='';
     const tr=document.createElement('tr');
@@ -193,7 +213,7 @@ document.addEventListener('DOMContentLoaded', () => {
         th.addEventListener('click', ()=>{
           if(sortState.key===c.key){ sortState.dir = (sortState.dir==='asc'?'desc':'asc'); }
           else { sortState.key=c.key; sortState.dir='asc'; }
-          buildHeader(); render(); // refresh header arrows + body
+          buildHeader(); render();
         });
       }
       tr.appendChild(th);
@@ -201,13 +221,15 @@ document.addEventListener('DOMContentLoaded', () => {
     thead.appendChild(tr);
   }
 
-  // Comparateur de tri
+  /* ===== Comparateur ===== */
   function cmp(a,b,c){
-    const col = Columns.find(x=>x.key===c.key);
     let va=a[c.key], vb=b[c.key];
-    if(col.type==='number'){
+    if(c.key==='guerre'){
+      const order={'WW1':1,'WW2':2,'Autres':3,'':4,undefined:4,null:4};
+      va = order[va] ?? 4; vb = order[vb] ?? 4;
+    } else if(c.type==='number'){
       va=parseInt(va||'0',10)||0; vb=parseInt(vb||'0',10)||0;
-    } else if(col.type==='bool'){
+    } else if(c.type==='bool'){
       va = !!va ? 1 : 0; vb = !!vb ? 1 : 0;
     } else {
       va = String(va??'').toLowerCase(); vb = String(vb??'').toLowerCase();
@@ -215,33 +237,47 @@ document.addEventListener('DOMContentLoaded', () => {
     if(va<vb) return -1; if(va>vb) return 1; return 0;
   }
 
-  // Rendu
+  /* ===== Rendu ===== */
+  function applyFilter(arr){
+    if(guerreFilter==='ALL') return arr;
+    return arr.filter(r=>{
+      const v=(r.guerre||'').trim();
+      if(guerreFilter==='(vide)') return v==='';
+      return v===guerreFilter;
+    });
+  }
+
   function render(){
-    // vue triée avec index d'origine
-    const view = rows.map((r,i)=>({ ...r, _idx:i }));
+    const view = applyFilter(rows).map((r,i)=>({ ...r, _idx:i }));
     const col = Columns.find(c=>c.key===sortState.key) || Columns[0];
     view.sort((x,y)=> (cmp(x,y,col)) * (sortState.dir==='asc'?1:-1));
 
     tbody.innerHTML='';
-    view.forEach((r)=>{
+    view.forEach(r=>{
       const tr=document.createElement('tr');
       Columns.forEach(c=>{
         const td=document.createElement('td');
         if(c.sticky){ td.classList.add('sticky'); td.style.width='64px'; }
         if(c.type==='actions'){
           const box=document.createElement('div'); box.className='row-actions';
-          const edit=btn('✏️','Éditer',()=>enterRowEdit(tr, rows[r._idx], r._idx));
+          const edit=btn('✏️','Éditer',()=>enterRowEdit(tr, r, r._idx));
           const del=btn('🗑️','Supprimer',()=>{ rows.splice(r._idx,1); render(); if(statsOpen()) renderStats(); toast('Ligne supprimée'); });
           box.appendChild(edit); box.appendChild(del); td.appendChild(box);
         } else if(c.type==='bool'){
           const cb=document.createElement('input'); cb.type='checkbox'; cb.checked=!!r[c.key];
           cb.onchange=()=>{ rows[r._idx][c.key]=cb.checked; if(statsOpen()) renderStats(); };
           td.appendChild(cb);
-        } else if(c.type==='choice'){
+        } else if(c.key==='guerre'){
           const sel=document.createElement('select');
           (c.options||['']).forEach(v=>{const o=document.createElement('option');o.value=v;o.text=v;sel.appendChild(o);});
-          sel.value=r[c.key]||''; sel.onchange=()=>{ rows[r._idx][c.key]=sel.value; if(statsOpen()) renderStats(); };
-          td.appendChild(sel);
+          sel.value=r.guerre||'';
+          sel.onchange=()=>{
+            rows[r._idx].guerre=sel.value;
+            render(); // met à jour pastille + éventuel filtrage
+            if(statsOpen()) renderStats();
+          };
+          const badge=document.createElement('span'); badge.className='badge'; setBadge(badge, r.guerre||'');
+          td.appendChild(sel); td.appendChild(document.createTextNode(' ')); td.appendChild(badge);
         } else {
           td.textContent=r[c.key]||'';
           td.ondblclick=()=>{
@@ -254,21 +290,31 @@ document.addEventListener('DOMContentLoaded', () => {
       });
       tbody.appendChild(tr);
     });
-    byId('countShown').textContent=rows.length;
+    byId('countShown').textContent=view.length;
     byId('countTotal').textContent=rows.length;
   }
 
-  // Édition ligne entière (utilise l’index réel)
-  function enterRowEdit(tr,row,rowIndex){
+  function setBadge(el, val){
+    el.textContent = val || '—';
+    el.className='badge';
+    if(val==='WW1') el.classList.add('badge-ww1');
+    else if(val==='WW2') el.classList.add('badge-ww2');
+    else if(val==='Autres') el.classList.add('badge-autres');
+  }
+
+  /* ===== Edition ligne entière ===== */
+  function enterRowEdit(tr,row,realIndex){
     const cells=tr.querySelectorAll('td');
     Columns.forEach((c,i)=>{
       const td=cells[i]; if(!td || c.type==='actions') return;
       td.innerHTML='';
       if(c.type==='bool'){
         const cb=document.createElement('input'); cb.type='checkbox'; cb.checked=!!row[c.key]; cb.onchange=()=>row[c.key]=cb.checked; td.appendChild(cb);
-      } else if(c.type==='choice'){
+      } else if(c.key==='guerre'){
         const sel=document.createElement('select'); (c.options||['']).forEach(v=>{const o=document.createElement('option');o.value=v;o.text=v;sel.appendChild(o);});
         sel.value=row[c.key]||''; sel.onchange=()=>row[c.key]=sel.value; td.appendChild(sel);
+        const badge=document.createElement('span'); badge.className='badge'; badge.style.marginLeft='6px'; setBadge(badge,row[c.key]||''); td.appendChild(badge);
+        sel.addEventListener('change',()=>setBadge(badge, sel.value||''));
       } else {
         const inp=document.createElement('input'); inp.type='text'; inp.value=row[c.key]||''; inp.style.width='100%'; td.appendChild(inp);
       }
@@ -287,40 +333,63 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
-  // Import CSV
+  /* ===== Import CSV ===== */
   byId('fileInput').addEventListener('change', e=>{
     const f=e.target.files?.[0]; if(!f) return;
     f.text().then(txt=>{
-      const grid=parseCSV(txt); if(grid.length===0) return;
+      // auto-détection ; , tab | (simple)
+      const delim = detectDelimiter(txt);
+      const grid=parseCSV(txt, delim);
+      if(grid.length===0) return;
       const header=grid[0]; const body=grid.slice(1);
-      const norm=s=>String(s).trim().toLowerCase().replace(/\s+/g,' ').replace(/\./g,'').replace(/é/g,'e').replace(/º|°/g,'o');
-      const label2key={}; Columns.forEach(c=>{ if(c.key!=='_actions') label2key[norm(c.label)]=c.key; });
-      const map={}; header.forEach((h,i)=>{ const k=label2key[norm(h)]; if(k) map[i]=k; });
+      const norm=s=>String(s).trim().toLowerCase().replace(/[éèêë]/g,'e').replace(/[º°]/g,'o').replace(/\./g,'').replace(/\s+/g,' ');
+      const map={};
+      const label2key = {};
+      // Alias côté appli pour ton en-tête exact
+      const aliases = {
+        'nº':'numero','no':'numero','n°':'numero','numero':'numero','numero':'numero','numéro':'numero',
+        'titre':'titre','title':'titre',
+        'voyage':'voyage','aviation':'aviation','animation':'animation','aventure':'aventure',
+        's fiction':'sf','sf':'sf','sfiction':'sf','science fiction':'sf','science-fiction':'sf',
+        'exploration':'explor','explor':'explor','espace':'explor',
+        'guerre':'guerre','animaux':'animaux','disney':'disney','horreur':'horreur',
+        'enfants':'enfants','famille':'famille','histoire':'histoire','autres':'autres',
+        'nom cle':'nomcle','nom-clé':'nomcle','nom clé':'nomcle','nomcle':'nomcle','keywords':'nomcle','tags':'nomcle'
+      };
+      Columns.forEach(c=>{ if(c.key!=='_actions') label2key[norm(c.label)]=c.key; });
+      header.forEach((h,i)=>{
+        const n=norm(h);
+        const k = label2key[n] || aliases[n] || null;
+        if(k) map[i]=k;
+      });
+
       rows = body.filter(r=>r.some(c=>String(c).trim()!=='')).map(r=>{
         const o={}; Columns.forEach(c=>{ if(c.key!=='_actions') o[c.key]=(c.type==='bool'?false:''); });
         r.forEach((cell,i)=>{
           const key=map[i]; if(!key) return;
           if(key==='guerre'){
             const v=String(cell).trim().toLowerCase();
-            o.guerre = v.includes('ww1')||v.includes('14-18') ? 'WW1'
-                   : v.includes('ww2')||v.includes('39-45') ? 'WW2'
+            o.guerre = (v.includes('ww1')||v.includes('14-18')||v.includes('1914')) ? 'WW1'
+                   : (v.includes('ww2')||v.includes('39-45')||v.includes('194')) ? 'WW2'
                    : (v===''||v==='non' ? '' : 'Autres');
           } else if(Columns.find(c=>c.key===key)?.type==='bool'){
             const v=String(cell).trim().toLowerCase();
             o[key]=['1','oui','yes','true','vrai','x','✓'].includes(v);
-          } else if(key==='numero'){ o.numero=String(cell).replace(/[^\d]/g,''); }
+          } else if(key==='numero'){ o.numero = String(cell).replace(/[^\d]/g,''); }
           else { o[key]=String(cell).trim(); }
         });
         return o;
       });
+
       // auto-numérotation
       let max=rows.reduce((m,r)=>Math.max(m,parseInt(r.numero||0,10)||0),0);
       rows.forEach(r=>{ if(!r.numero){ max+=1; r.numero=String(max); } });
+
       buildHeader(); render(); if(statsOpen()) renderStats(); toast('CSV importé');
     });
   });
 
-  // Ajouter
+  /* ===== Ajouter / Tout effacer ===== */
   byId('btnAdd').addEventListener('click', ()=>{
     const max=rows.reduce((m,r)=>Math.max(m,parseInt(r.numero||0,10)||0),0);
     rows.unshift({
@@ -331,17 +400,25 @@ document.addEventListener('DOMContentLoaded', () => {
     });
     render(); if(statsOpen()) renderStats(); toast('Ligne ajoutée');
   });
-
-  // Tout effacer
   byId('btnClearAll').addEventListener('click', ()=>{
     if(confirm('Confirmer : effacer TOUT le tableau ? Cette action est irréversible.')){
-      rows = [];
-      render(); if(statsOpen()) renderStats(); toast('Toutes les lignes ont été effacées');
+      rows=[]; render(); if(statsOpen()) renderStats(); toast('Toutes les lignes ont été effacées');
     }
   });
 
-  // Stats & Paramètres
-  const statsEl=byId('stats'); byId('btnStats').addEventListener('click', ()=>{ statsEl.classList.toggle('open'); if(statsEl.classList.contains('open')) renderStats(); });
+  /* ===== Filtres Guerre ===== */
+  document.querySelectorAll('#guerreFilters .chipbtn').forEach(b=>{
+    b.addEventListener('click', ()=>{
+      document.querySelectorAll('#guerreFilters .chipbtn').forEach(x=>x.classList.remove('active'));
+      b.classList.add('active');
+      guerreFilter = b.dataset.v;
+      render();
+    });
+  });
+
+  /* ===== Stats & Paramètres ===== */
+  const statsEl=byId('stats');
+  byId('btnStats').addEventListener('click', ()=>{ statsEl.classList.toggle('open'); if(statsEl.classList.contains('open')) renderStats(); });
   function statsOpen(){ return statsEl.classList.contains('open'); }
   byId('btnSettings').addEventListener('click', ()=> byId('sheet').classList.toggle('open'));
   byId('cbCompact').addEventListener('change', e=>{ document.body.style.fontSize = e.target.checked ? '14px' : '15px'; });
@@ -359,7 +436,7 @@ document.addEventListener('DOMContentLoaded', () => {
       themesBody.appendChild(metric(label,val,total,val/max*100));
     });
     const g={WW1:0,WW2:0,Autres:0,'(vide)':0};
-    rows.forEach(r=>{ const v=(r.guerre||'').trim(); if(v==='WW1')g.WW1++; else if(v==='WW2')g.WW2++; else g.Autres += (v==='Autres'?1:0); if(!v) g['(vide)']++; });
+    rows.forEach(r=>{ const v=(r.guerre||'').trim(); if(v==='WW1')g.WW1++; else if(v==='WW2')g.WW2++; else if(v==='Autres')g.Autres++; else g['(vide)']++; });
     ['WW1','WW2','Autres','(vide)'].forEach(k=>{ guerreBody.appendChild(metric('Guerre '+k, g[k], total, (g[k]/total)*100)); });
 
     const chips=document.createElement('div'); chips.className='chips';
@@ -381,27 +458,45 @@ document.addEventListener('DOMContentLoaded', () => {
   }
   function chip(txt){ const s=document.createElement('span'); s.className='chip'; s.textContent=txt; return s; }
 
-  // Utils
+  /* ===== Utilitaires ===== */
   function btn(txt,title,fn){ const b=document.createElement('button'); b.className='icon-btn'; b.textContent=txt; b.title=title; b.type='button'; b.onclick=fn; return b; }
   function byId(id){ return document.getElementById(id); }
   function toast(msg){ const t=byId('toast'); t.textContent=msg; t.classList.add('show'); clearTimeout(toast._timer); toast._timer=setTimeout(()=>t.classList.remove('show'),1600); }
-  function parseCSV(text){
+
+  // mini parseur CSV pour import (avec détection de séparateur)
+  function detectDelimiter(sample){
+    const line=(sample.split(/\r?\n/)[0]||sample);
+    const candidates=[';',',','\t','|'];
+    let best=',',bestCount=0;
+    for(const d of candidates){ const c=line.split(d).length; if(c>bestCount){ bestCount=c; best=d; } }
+    return best;
+  }
+  function parseCSV(text,delim){
     const out=[]; let row=[]; let cur=''; let inQ=false;
     for(let i=0;i<text.length;i++){
       const c=text[i];
-      if(inQ){ if(c=='"'){ if(text[i+1]=='"'){ cur+='"'; i++; } else inQ=false; } else cur+=c; }
-      else { if(c=='"') inQ=true; else if(c==','){ row.push(cur); cur=''; } else if(c=='\n'){ row.push(cur); out.push(row); row=[]; cur=''; } else if(c!='\r'){ cur+=c; } }
+      if(inQ){
+        if(c=='"'){ if(text[i+1]=='"'){ cur+='"'; i++; } else inQ=false; }
+        else cur+=c;
+      }else{
+        if(c=='"'){ inQ=true; }
+        else if(c===delim){ row.push(cur); cur=''; }
+        else if(c=='\n'){ row.push(cur); out.push(row); row=[]; cur=''; }
+        else if(c=='\r'){ /* skip */ }
+        else cur+=c;
+      }
     }
-    if(cur!=='' || text.endsWith(',')) row.push(cur);
+    if(cur!=='' || text.endsWith(delim)) row.push(cur);
     if(row.length) out.push(row);
     return out;
   }
 
-  // Données démo
+  /* ===== Démo initiale ===== */
   rows=[
     { numero:'1',  titre:'Le Voyage de Chihiro', voyage:true, aviation:false, animation:true,  aventure:true,  sf:false, explor:false, guerre:'',    animaux:true,  disney:false, horreur:false, enfants:true,  famille:true,  histoire:false, autres:false, nomcle:'Miyazaki' },
     { numero:'2',  titre:'Dunkerque',            voyage:false,aviation:true,  animation:false, aventure:false, sf:false, explor:false, guerre:'WW2', animaux:false, disney:false, horreur:false, enfants:false, famille:false, histoire:true,  autres:false, nomcle:'Christopher Nolan' },
-    { numero:'42', titre:'Interstellar',         voyage:false,aviation:false, animation:false, aventure:true,  sf:true,  explor:true,  guerre:'',    animaux:false, disney:false, horreur:false, enfants:false, famille:false, histoire:false,autres:false, nomcle:'Matthew McConaughey; Nolan' }
+    { numero:'42', titre:'Interstellar',         voyage:false,aviation:false, animation:false, aventure:true,  sf:true,  explor:true,  guerre:'',    animaux:false, disney:false, horreur:false, enfants:false, famille:false, histoire:false,autres:false, nomcle:'Matthew McConaughey; Nolan' },
+    { numero:'7',  titre:'Les Sentiers de la gloire', voyage:false,aviation:false, animation:false, aventure:false, sf:false, explor:false, guerre:'WW1', animaux:false, disney:false, horreur:false, enfants:false, famille:false, histoire:true, autres:false, nomcle:'Kubrick' }
   ];
   buildHeader(); render();
 });
