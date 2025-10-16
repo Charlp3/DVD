@@ -2,90 +2,71 @@
 <html lang="fr">
 <head>
 <meta charset="utf-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-<title>DVD — Gestion CSV</title>
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
+<title>DVD — Gestion CSV (v2.1.1)</title>
 <meta name="theme-color" content="#22c55e">
-<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='10' ry='10' fill='%23facc15'/%3E%3Ccircle cx='22' cy='32' r='12' fill='%23fffbe9'/%3E%3Ccircle cx='22' cy='32' r='3' fill='%2316a34a'/%3E%3C/svg%3E">
 <style>
-  :root {
-    --bg:#fdf8e5; --panel:#fffdf5; --border:#e7dca8;
-    --text:#3a2e0a; --muted:#7a6b3a;
-    --accent:#22c55e; --accent-2:#16a34a;
-    --shadow:0 4px 16px rgba(0,0,0,.1); --radius:10px;
-  }
-  html,body{height:100%;margin:0;font-family:system-ui,-apple-system,Segoe UI,Roboto;}
-  body{background:radial-gradient(700px 450px at 30% -10%,#fff8dc 0%,#f5e8b8 40%,var(--bg) 80%) fixed;color:var(--text);font-size:15px;}
-  header{position:sticky;top:0;z-index:20;background:linear-gradient(180deg,#fffbea,#f3e9b5);border-bottom:1px solid var(--border);box-shadow:0 2px 5px rgba(0,0,0,.05);}
-  .wrap{max-width:1200px;margin:0 auto;padding:12px 16px;}
-  h1{font-size:20px;margin:0;font-weight:700;color:#3a2e0a;}
-  .toolbar{display:flex;flex-wrap:wrap;gap:.5rem;margin-top:10px;align-items:center}
-  .btn{
-    appearance:none;border:1px solid rgba(22,163,74,.4);
-    background:linear-gradient(180deg,rgba(34,197,94,.25),rgba(22,163,74,.15));
-    color:#084c24;font-weight:600;padding:.55rem .8rem;border-radius:8px;cursor:pointer;
-    transition:.2s transform,.2s background;box-shadow:var(--shadow);
-  }
-  .btn:hover{transform:translateY(-1px);background:linear-gradient(180deg,rgba(34,197,94,.35),rgba(22,163,74,.25));}
-  .btn.secondary{border:1px solid #d6b54a;background:linear-gradient(180deg,#fff1b8,#f9e58a);color:#3a2e0a;}
-  .btn.warn{border:1px solid #facc15;background:linear-gradient(180deg,#fff9c4,#fae46c);color:#3a2e0a;}
-  .btn.danger{border:1px solid #f87171;background:linear-gradient(180deg,#ffe4e6,#fecaca);color:#7f1d1d;}
-  input[type="file"]{display:none}
-  .filters{display:flex;gap:.35rem;align-items:center;margin-left:auto}
-  .chipbtn{border:1px solid #e5d58e;background:#fff7cf;color:#5f4f19;padding:.35rem .6rem;border-radius:999px;cursor:pointer;font-weight:600}
-  .chipbtn.active{border-color:#b79a2e;background:#ffe98a}
-  .chipbtn[data-v="WW1"]{background:#eaf4ff;border-color:#b9d6ff}
-  .chipbtn[data-v="WW2"]{background:#eef6d3;border-color:#cfe7a5}
-  .chipbtn[data-v="Autres"]{background:#f2f2f2;border-color:#dedede}
-
-  .panel{margin:12px auto;background:var(--panel);border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow);}
-  .table-wrap{overflow:auto;max-height:calc(100vh - 320px);border-top:1px solid var(--border)}
-  table{border-collapse:separate;border-spacing:0;width:100%;min-width:1100px;}
-  thead th{position:sticky;top:0;background:#fff8dc;border-bottom:2px solid var(--border);padding:.5rem .55rem;text-align:left;color:#3a2e0a;font-weight:700;user-select:none;}
-  thead th.sortable{cursor:pointer}
-  thead th .sortmark{color:#6b5a1d;font-size:12px;margin-left:.35rem}
-  tbody td{border-bottom:1px solid #efe3b5;padding:.4rem .5rem;vertical-align:middle;}
-  tbody tr:hover td{background:#fffbe1;}
-  th.sticky,td.sticky{position:sticky;left:0;z-index:15;background:#fffce6;border-right:1px solid var(--border);}
-  .row-actions{display:flex;gap:.35rem;justify-content:flex-end}
-  .icon-btn{border:1px solid rgba(22,163,74,.4);color:#0b4f27;background:linear-gradient(180deg,rgba(34,197,94,.2),rgba(22,163,74,.12));width:30px;height:30px;border-radius:8px;cursor:pointer;}
-  .icon-btn:hover{background:linear-gradient(180deg,rgba(34,197,94,.3),rgba(22,163,74,.2))}
-  .boolean input[type="checkbox"]{width:18px;height:18px;accent-color:var(--accent);}
-  .num{font-variant-numeric:tabular-nums;}
-
-  /* Pastilles Guerre */
-  .badge{display:inline-block;padding:.15rem .45rem;border-radius:999px;font-size:12px;border:1px solid transparent}
-  .badge-ww1{background:#eaf4ff;border-color:#b9d6ff;color:#113a74}
-  .badge-ww2{background:#eef6d3;border-color:#cfe7a5;color:#3c4b1f}
-  .badge-autres{background:#f2f2f2;border-color:#dedede;color:#4b5563}
-
-  .footer{display:flex;justify-content:space-between;align-items:center;padding:10px 14px;font-size:14px;color:#4b3f16;background:#fff9d3;border-top:1px solid var(--border);}
-  .stats{display:none;grid-template-columns:1fr 1fr;gap:16px;margin:10px auto 0;max-width:1200px;padding:0 16px 16px;}
-  .stats.open{display:grid;animation:fadeIn .18s ease-out;}
-  .card{background:#fffef6;border:1px solid var(--border);border-radius:10px;box-shadow:var(--shadow);}
-  .card h3{margin:0;padding:10px 12px;font-size:15px;background:#fff7cf;border-bottom:1px solid var(--border);}
-  .card .body{padding:10px 12px;}
-  .metric{display:flex;align-items:center;gap:10px;margin:8px 0;}
-  .metric .label{min-width:150px;color:#5a4a17}
-  .bar{flex:1;height:12px;border-radius:999px;background:#fff2b8;border:1px solid #eed26a;overflow:hidden}
-  .bar i{display:block;height:100%;background:linear-gradient(90deg,#22c55e,#16a34a);width:0%}
-  .val{font-variant-numeric:tabular-nums;color:#3a2e0a}
-  .chips{display:flex;flex-wrap:wrap;gap:8px;margin-top:8px}
-  .chip{font-size:12px;background:#fff7cf;border:1px solid var(--border);padding:.2rem .5rem;border-radius:999px;color:#5a4a17}
-
-  .settings{position:fixed;right:16px;bottom:16px;z-index:50;}
-  .sheet{position:fixed;right:16px;bottom:72px;width:320px;max-width:92vw;background:#fffdf0;border:1px solid var(--border);border-radius:10px;box-shadow:var(--shadow);padding:12px 14px;display:none;}
-  .sheet.open{display:block;animation:fadeIn .2s ease-out;}
-  @keyframes fadeIn{from{opacity:0;transform:translateY(5px);}to{opacity:1;transform:translateY(0);}}
-  .sheet h3{margin:0 0 8px;font-size:15px;}
-  .field{display:flex;justify-content:space-between;align-items:center;padding:6px 0;}
-  .field label{font-size:14px;}
-  .field input[type="checkbox"]{width:18px;height:18px;accent-color:var(--accent);}
-  .sub{font-size:12px;color:#7c6a28;}
-
-  #toast{position:fixed;left:50%;bottom:18px;transform:translateX(-50%);background:#f0fdf4;color:#14532d;border:1px solid #86efac;padding:10px 14px;border-radius:8px;box-shadow:var(--shadow);opacity:0;transition:opacity .2s ease;z-index:9999;}
-  #toast.show{opacity:1;}
-
-  @media(max-width:480px){body{font-size:14px}table{min-width:900px}}
+:root{
+  --bg:#fdf8e5;--panel:#fffdf5;--border:#e7dca8;
+  --text:#3a2e0a;--muted:#7a6b3a;
+  --accent:#22c55e;--accent-2:#16a34a;
+  --shadow:0 4px 16px rgba(0,0,0,.1);--radius:10px;
+}
+html,body{margin:0;height:100%;font-family:system-ui,-apple-system,Segoe UI,Roboto;background:var(--bg);color:var(--text);}
+header{background:linear-gradient(180deg,#fffbea,#f3e9b5);border-bottom:1px solid var(--border);box-shadow:0 2px 5px rgba(0,0,0,.05);position:sticky;top:0;z-index:20;}
+.wrap{max-width:1200px;margin:0 auto;padding:12px 16px;}
+h1{margin:0;font-size:20px;color:#3a2e0a;font-weight:700}
+.toolbar{display:flex;flex-wrap:wrap;gap:.5rem;align-items:center;margin-top:10px}
+.btn{appearance:none;border:1px solid rgba(22,163,74,.4);
+  background:linear-gradient(180deg,rgba(34,197,94,.25),rgba(22,163,74,.15));
+  color:#084c24;font-weight:600;padding:.55rem .8rem;border-radius:8px;cursor:pointer;
+  transition:.2s transform,.2s background;box-shadow:var(--shadow)}
+.btn:hover{transform:translateY(-1px);background:linear-gradient(180deg,rgba(34,197,94,.35),rgba(22,163,74,.25))}
+.btn.secondary{border:1px solid #d6b54a;background:linear-gradient(180deg,#fff1b8,#f9e58a);color:#3a2e0a;}
+.btn.danger{border:1px solid #f87171;background:linear-gradient(180deg,#ffe4e6,#fecaca);color:#7f1d1d;}
+input[type="file"]{display:none}
+.filters{display:flex;gap:.35rem;flex-wrap:wrap;margin-left:auto}
+.chipbtn{border:1px solid #e5d58e;background:#fff7cf;color:#5f4f19;padding:.3rem .6rem;border-radius:999px;cursor:pointer;font-weight:600}
+.chipbtn.active{border-color:#b79a2e;background:#ffe98a}
+.chipbtn[data-v="WW1"]{background:#eaf4ff;border-color:#b9d6ff}
+.chipbtn[data-v="WW2"]{background:#eef6d3;border-color:#cfe7a5}
+.chipbtn[data-v="Autres"]{background:#f2f2f2;border-color:#dedede}
+.panel{margin:12px auto;background:var(--panel);border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow)}
+.table-wrap{overflow:auto;max-height:calc(100vh - 300px)}
+table{border-collapse:separate;border-spacing:0;width:100%;min-width:1000px}
+thead th{position:sticky;top:0;background:#fff8dc;border-bottom:2px solid var(--border);padding:.5rem;text-align:left;user-select:none}
+thead th.sortable{cursor:pointer}
+thead th .sortmark{color:#6b5a1d;font-size:12px;margin-left:.35rem}
+tbody td{border-bottom:1px solid #efe3b5;padding:.4rem .5rem;vertical-align:middle}
+tbody tr:hover td{background:#fffbe1}
+th.sticky,td.sticky{position:sticky;left:0;background:#fffce6;border-right:1px solid var(--border);z-index:5}
+.row-actions{display:flex;gap:.35rem;justify-content:flex-end}
+.icon-btn{border:1px solid rgba(22,163,74,.4);color:#0b4f27;background:linear-gradient(180deg,rgba(34,197,94,.2),rgba(22,163,74,.12));width:30px;height:30px;border-radius:8px;cursor:pointer}
+.icon-btn:hover{background:linear-gradient(180deg,rgba(34,197,94,.3),rgba(22,163,74,.2))}
+.boolean input[type="checkbox"]{width:18px;height:18px;accent-color:var(--accent)}
+.num{font-variant-numeric:tabular-nums}
+.badge{display:inline-block;padding:.15rem .45rem;border-radius:999px;font-size:12px;border:1px solid transparent;margin-left:.35rem}
+.badge-ww1{background:#eaf4ff;border-color:#b9d6ff;color:#113a74}
+.badge-ww2{background:#eef6d3;border-color:#cfe7a5;color:#3c4b1f}
+.badge-autres{background:#f2f2f2;border-color:#dedede;color:#4b5563}
+.footer{display:flex;justify-content:space-between;align-items:center;padding:10px 14px;font-size:14px;color:#4b3f16;background:#fff9d3;border-top:1px solid var(--border)}
+.stats{display:none;grid-template-columns:1fr 1fr;gap:16px;margin:10px auto;max-width:1200px;padding:0 16px 16px}
+.stats.open{display:grid;animation:fadeIn .18s ease-out}
+.card{background:#fffef6;border:1px solid var(--border);border-radius:10px;box-shadow:var(--shadow)}
+.card h3{margin:0;padding:10px 12px;font-size:15px;background:#fff7cf;border-bottom:1px solid var(--border)}
+.card .body{padding:10px 12px}
+.metric{display:flex;align-items:center;gap:10px;margin:8px 0}
+.metric .label{min-width:150px;color:#5a4a17}
+.bar{flex:1;height:12px;border-radius:999px;background:#fff2b8;border:1px solid #eed26a;overflow:hidden}
+.bar i{display:block;height:100%;background:linear-gradient(90deg,#22c55e,#16a34a);width:0%}
+.val{font-variant-numeric:tabular-nums;color:#3a2e0a}
+.settings{position:fixed;right:16px;bottom:16px}
+.sheet{position:fixed;right:16px;bottom:70px;width:320px;max-width:90vw;background:#fffdf0;border:1px solid var(--border);border-radius:10px;box-shadow:var(--shadow);padding:12px 14px;display:none}
+.sheet.open{display:block;animation:fadeIn .2s ease-out}
+#toast{position:fixed;left:50%;bottom:18px;transform:translateX(-50%);background:#f0fdf4;color:#14532d;border:1px solid #86efac;padding:10px 14px;border-radius:8px;box-shadow:var(--shadow);opacity:0;transition:opacity .2s ease;z-index:99}
+#toast.show{opacity:1}
+@keyframes fadeIn{from{opacity:0;transform:translateY(5px);}to{opacity:1;transform:translateY(0);}}
+@media(max-width:480px){body{font-size:14px}table{min-width:900px}}
 </style>
 </head>
 <body>
@@ -94,13 +75,13 @@
     <h1>DVD — Gestion CSV</h1>
     <div class="toolbar">
       <label class="btn" for="fileInput">📂 Importer CSV</label>
-      <input id="fileInput" type="file" accept=".csv" />
+      <input id="fileInput" type="file" accept=".csv,text/csv" />
       <button class="btn secondary" id="btnAdd" type="button">➕ Ajouter</button>
       <button class="btn danger" id="btnClearAll" type="button">🗑️ Tout effacer</button>
       <button class="btn" id="btnStats" type="button">📊 Statistiques</button>
-      <button class="btn warn" id="btnSettings" type="button">⚙️ Paramètres</button>
+      <button class="btn" id="btnSettings" type="button">⚙️ Paramètres</button>
 
-      <!-- Filtres rapides Guerre -->
+      <!-- Filtres Guerre -->
       <div class="filters" id="guerreFilters" aria-label="Filtre Guerre">
         <button class="chipbtn active" data-v="ALL" type="button">Tous</button>
         <button class="chipbtn" data-v="WW1" type="button">WW1</button>
@@ -142,31 +123,24 @@
   <div class="sheet" id="sheet">
     <h3>⚙️ Paramètres</h3>
     <div class="field">
-      <label for="cbCompact">Mode compact</label>
-      <input type="checkbox" id="cbCompact">
+      <label><input type="checkbox" id="cbCompact"> Mode compact</label>
     </div>
-    <div class="sub">Réduit l’espacement pour voir plus de lignes.</div>
-
     <div class="field">
-      <label for="cbNarrowNo">Colonne Nº étroite</label>
-      <input type="checkbox" id="cbNarrowNo" checked>
+      <label><input type="checkbox" id="cbNarrowNo" checked> Colonne Nº étroite</label>
     </div>
-    <div class="sub">Réduit la largeur de la colonne Nº (pour iPhone).</div>
-
-    <div class="field">
-      <label>Version</label>
-      <span>v<span id="ver2"></span></span>
-    </div>
+    <p>Version <span id="ver2"></span></p>
   </div>
 </div>
 
 <div id="toast" role="status" aria-live="polite"></div>
 
 <script>
-document.addEventListener('DOMContentLoaded', () => {
-  const APP_VERSION='2.0';
+document.addEventListener('DOMContentLoaded', ()=>{
+  const APP_VERSION='2.1.1';
   byId('version').textContent=APP_VERSION;
   byId('ver2').textContent=APP_VERSION;
+
+  const STORAGE_KEY='dvd_collection_v2';
 
   const Columns=[
    {key:'numero',label:'Nº',type:'number',sticky:true,sortable:true},
@@ -196,7 +170,19 @@ document.addEventListener('DOMContentLoaded', () => {
   const thead=byId('thead');
   const tbody=byId('tbody');
 
-  /* ===== Entête + tri ===== */
+  /* ===== Local Storage ===== */
+  function saveLocal(){ try{ localStorage.setItem(STORAGE_KEY, JSON.stringify(rows)); }catch(e){ console.warn(e); } }
+  function loadLocal(){
+    try{
+      const s=localStorage.getItem(STORAGE_KEY);
+      if(!s) return null;
+      const data=JSON.parse(s);
+      if(Array.isArray(data)) return data;
+    }catch(e){ console.warn(e); }
+    return null;
+  }
+
+  /* ===== Header + Tri ===== */
   function buildHeader(){
     thead.innerHTML='';
     const tr=document.createElement('tr');
@@ -207,8 +193,7 @@ document.addEventListener('DOMContentLoaded', () => {
       if(c.sortable){
         th.classList.add('sortable');
         const mark=document.createElement('span'); mark.className='sortmark';
-        if(sortState.key===c.key) mark.textContent = sortState.dir==='asc'?'▲':'▼';
-        else mark.textContent='▵';
+        mark.textContent = (sortState.key===c.key) ? (sortState.dir==='asc'?'▲':'▼') : '▵';
         th.appendChild(mark);
         th.addEventListener('click', ()=>{
           if(sortState.key===c.key){ sortState.dir = (sortState.dir==='asc'?'desc':'asc'); }
@@ -221,7 +206,6 @@ document.addEventListener('DOMContentLoaded', () => {
     thead.appendChild(tr);
   }
 
-  /* ===== Comparateur ===== */
   function cmp(a,b,c){
     let va=a[c.key], vb=b[c.key];
     if(c.key==='guerre'){
@@ -237,63 +221,7 @@ document.addEventListener('DOMContentLoaded', () => {
     if(va<vb) return -1; if(va>vb) return 1; return 0;
   }
 
-  /* ===== Rendu ===== */
-  function applyFilter(arr){
-    if(guerreFilter==='ALL') return arr;
-    return arr.filter(r=>{
-      const v=(r.guerre||'').trim();
-      if(guerreFilter==='(vide)') return v==='';
-      return v===guerreFilter;
-    });
-  }
-
-  function render(){
-    const view = applyFilter(rows).map((r,i)=>({ ...r, _idx:i }));
-    const col = Columns.find(c=>c.key===sortState.key) || Columns[0];
-    view.sort((x,y)=> (cmp(x,y,col)) * (sortState.dir==='asc'?1:-1));
-
-    tbody.innerHTML='';
-    view.forEach(r=>{
-      const tr=document.createElement('tr');
-      Columns.forEach(c=>{
-        const td=document.createElement('td');
-        if(c.sticky){ td.classList.add('sticky'); td.style.width='64px'; }
-        if(c.type==='actions'){
-          const box=document.createElement('div'); box.className='row-actions';
-          const edit=btn('✏️','Éditer',()=>enterRowEdit(tr, r, r._idx));
-          const del=btn('🗑️','Supprimer',()=>{ rows.splice(r._idx,1); render(); if(statsOpen()) renderStats(); toast('Ligne supprimée'); });
-          box.appendChild(edit); box.appendChild(del); td.appendChild(box);
-        } else if(c.type==='bool'){
-          const cb=document.createElement('input'); cb.type='checkbox'; cb.checked=!!r[c.key];
-          cb.onchange=()=>{ rows[r._idx][c.key]=cb.checked; if(statsOpen()) renderStats(); };
-          td.appendChild(cb);
-        } else if(c.key==='guerre'){
-          const sel=document.createElement('select');
-          (c.options||['']).forEach(v=>{const o=document.createElement('option');o.value=v;o.text=v;sel.appendChild(o);});
-          sel.value=r.guerre||'';
-          sel.onchange=()=>{
-            rows[r._idx].guerre=sel.value;
-            render(); // met à jour pastille + éventuel filtrage
-            if(statsOpen()) renderStats();
-          };
-          const badge=document.createElement('span'); badge.className='badge'; setBadge(badge, r.guerre||'');
-          td.appendChild(sel); td.appendChild(document.createTextNode(' ')); td.appendChild(badge);
-        } else {
-          td.textContent=r[c.key]||'';
-          td.ondblclick=()=>{
-            const inp=document.createElement('input'); inp.type='text'; inp.value=r[c.key]||''; inp.style.width='100%';
-            inp.onblur=()=>{ rows[r._idx][c.key]=inp.value; render(); if(statsOpen()) renderStats(); };
-            td.innerHTML=''; td.appendChild(inp); inp.focus(); inp.select();
-          };
-        }
-        tr.appendChild(td);
-      });
-      tbody.appendChild(tr);
-    });
-    byId('countShown').textContent=view.length;
-    byId('countTotal').textContent=rows.length;
-  }
-
+  /* ===== Render (corrigé pour filtres) ===== */
   function setBadge(el, val){
     el.textContent = val || '—';
     el.className='badge';
@@ -302,25 +230,81 @@ document.addEventListener('DOMContentLoaded', () => {
     else if(val==='Autres') el.classList.add('badge-autres');
   }
 
-  /* ===== Edition ligne entière ===== */
+  function applyFilterIndexed(arrWithIdx){
+    if(guerreFilter==='ALL') return arrWithIdx;
+    return arrWithIdx.filter(r=>{
+      const v=(r.guerre||'').trim();
+      if(guerreFilter==='(vide)') return v==='';
+      return v===guerreFilter;
+    });
+  }
+
+  function render(){
+    // 1) Vue avec index original
+    const withIdx = rows.map((r,i)=>({ ...r, _idx:i }));
+    // 2) Filtre
+    const filtered = applyFilterIndexed(withIdx);
+    // 3) Tri
+    const col = Columns.find(c=>c.key===sortState.key) || Columns[0];
+    filtered.sort((x,y)=> (cmp(x,y,col)) * (sortState.dir==='asc'?1:-1));
+    // 4) Rendu
+    tbody.innerHTML='';
+    filtered.forEach(r=>{
+      const tr=document.createElement('tr');
+      Columns.forEach(c=>{
+        const td=document.createElement('td');
+        if(c.sticky){ td.classList.add('sticky'); td.style.width='64px'; }
+        if(c.type==='actions'){
+          const box=document.createElement('div'); box.className='row-actions';
+          const edit=btn('✏️','Éditer',()=>enterRowEdit(tr, rows[r._idx], r._idx));
+          const del=btn('🗑️','Supprimer',()=>{ rows.splice(r._idx,1); saveLocal(); render(); if(statsOpen()) renderStats(); toast('Ligne supprimée'); });
+          box.appendChild(edit); box.appendChild(del); td.appendChild(box);
+        } else if(c.type==='bool'){
+          const cb=document.createElement('input'); cb.type='checkbox'; cb.checked=!!r[c.key];
+          cb.onchange=()=>{ rows[r._idx][c.key]=cb.checked; saveLocal(); if(statsOpen()) renderStats(); };
+          td.appendChild(cb);
+        } else if(c.key==='guerre'){
+          const sel=document.createElement('select');
+          (c.options||['']).forEach(v=>{const o=document.createElement('option');o.value=v;o.text=v;sel.appendChild(o);});
+          sel.value=r.guerre||'';
+          sel.onchange=()=>{ rows[r._idx].guerre=sel.value; saveLocal(); render(); if(statsOpen()) renderStats(); };
+          const badge=document.createElement('span'); badge.className='badge'; setBadge(badge, r.guerre||'');
+          td.appendChild(sel); td.appendChild(badge);
+        } else {
+          td.textContent=r[c.key]||'';
+          td.ondblclick=()=>{
+            const inp=document.createElement('input'); inp.type='text'; inp.value=r[c.key]||''; inp.style.width='100%';
+            inp.onblur=()=>{ rows[r._idx][c.key]=inp.value; saveLocal(); render(); if(statsOpen()) renderStats(); };
+            td.innerHTML=''; td.appendChild(inp); inp.focus(); inp.select();
+          };
+        }
+        tr.appendChild(td);
+      });
+      tbody.appendChild(tr);
+    });
+    byId('countShown').textContent=filtered.length;
+    byId('countTotal').textContent=rows.length;
+  }
+
   function enterRowEdit(tr,row,realIndex){
     const cells=tr.querySelectorAll('td');
     Columns.forEach((c,i)=>{
       const td=cells[i]; if(!td || c.type==='actions') return;
       td.innerHTML='';
       if(c.type==='bool'){
-        const cb=document.createElement('input'); cb.type='checkbox'; cb.checked=!!row[c.key]; cb.onchange=()=>row[c.key]=cb.checked; td.appendChild(cb);
+        const cb=document.createElement('input'); cb.type='checkbox'; cb.checked=!!row[c.key];
+        cb.onchange=()=>row[c.key]=cb.checked; td.appendChild(cb);
       } else if(c.key==='guerre'){
         const sel=document.createElement('select'); (c.options||['']).forEach(v=>{const o=document.createElement('option');o.value=v;o.text=v;sel.appendChild(o);});
         sel.value=row[c.key]||''; sel.onchange=()=>row[c.key]=sel.value; td.appendChild(sel);
-        const badge=document.createElement('span'); badge.className='badge'; badge.style.marginLeft='6px'; setBadge(badge,row[c.key]||''); td.appendChild(badge);
-        sel.addEventListener('change',()=>setBadge(badge, sel.value||''));
+        const b=document.createElement('span'); b.className='badge'; b.style.marginLeft='6px'; setBadge(b,row[c.key]||''); td.appendChild(b);
+        sel.addEventListener('change',()=>setBadge(b, sel.value||''));
       } else {
         const inp=document.createElement('input'); inp.type='text'; inp.value=row[c.key]||''; inp.style.width='100%'; td.appendChild(inp);
       }
     });
     const act=tr.lastElementChild; act.innerHTML='';
-    act.appendChild(btn('✅','Valider',()=>{ saveInline(tr,row); render(); if(statsOpen()) renderStats(); toast('Ligne mise à jour'); }));
+    act.appendChild(btn('✅','Valider',()=>{ saveInline(tr,row); saveLocal(); render(); if(statsOpen()) renderStats(); toast('Ligne mise à jour'); }));
     act.appendChild(btn('↩️','Annuler',()=>render()));
   }
   function saveInline(tr,row){
@@ -337,59 +321,67 @@ document.addEventListener('DOMContentLoaded', () => {
   byId('fileInput').addEventListener('change', e=>{
     const f=e.target.files?.[0]; if(!f) return;
     f.text().then(txt=>{
-      // auto-détection ; , tab | (simple)
       const delim = detectDelimiter(txt);
-      const grid=parseCSV(txt, delim);
+      const grid=parseCSV(txt,delim);
       if(grid.length===0) return;
       const header=grid[0]; const body=grid.slice(1);
-      const norm=s=>String(s).trim().toLowerCase().replace(/[éèêë]/g,'e').replace(/[º°]/g,'o').replace(/\./g,'').replace(/\s+/g,' ');
+
+      // mapping souple (entêtes variées)
       const map={};
-      const label2key = {};
-      // Alias côté appli pour ton en-tête exact
-      const aliases = {
-        'nº':'numero','no':'numero','n°':'numero','numero':'numero','numero':'numero','numéro':'numero',
-        'titre':'titre','title':'titre',
-        'voyage':'voyage','aviation':'aviation','animation':'animation','aventure':'aventure',
-        's fiction':'sf','sf':'sf','sfiction':'sf','science fiction':'sf','science-fiction':'sf',
-        'exploration':'explor','explor':'explor','espace':'explor',
-        'guerre':'guerre','animaux':'animaux','disney':'disney','horreur':'horreur',
-        'enfants':'enfants','famille':'famille','histoire':'histoire','autres':'autres',
-        'nom cle':'nomcle','nom-clé':'nomcle','nom clé':'nomcle','nomcle':'nomcle','keywords':'nomcle','tags':'nomcle'
-      };
-      Columns.forEach(c=>{ if(c.key!=='_actions') label2key[norm(c.label)]=c.key; });
       header.forEach((h,i)=>{
         const n=norm(h);
-        const k = label2key[n] || aliases[n] || null;
-        if(k) map[i]=k;
+        if(n.startsWith('n')) map[i]='numero';
+        else if(n.includes('titre')||n.includes('title')||n.includes('film')) map[i]='titre';
+        else if(n.includes('voyage')) map[i]='voyage';
+        else if(n.includes('aviation')) map[i]='aviation';
+        else if(n.includes('animation')||n==='anim') map[i]='animation';
+        else if(n.includes('aventure')) map[i]='aventure';
+        else if(n.includes('s fiction')||n==='sf'||n.includes('science')) map[i]='sf';
+        else if(n.includes('explor')||n.includes('espace')) map[i]='explor';
+        else if(n.includes('guerre')||n==='war') map[i]='guerre';
+        else if(n.includes('animaux')||n==='animal') map[i]='animaux';
+        else if(n.includes('disney')) map[i]='disney';
+        else if(n.includes('horreur')||n==='horror') map[i]='horreur';
+        else if(n.includes('enfant')||n==='kids') map[i]='enfants';
+        else if(n.includes('famille')||n==='family') map[i]='famille';
+        else if(n.includes('histo')) map[i]='histoire';
+        else if(n.includes('autres')||n==='autre'||n==='other'||n==='misc') map[i]='autres';
+        else if(n.includes('nom cle')||n.includes('nom-cl')||n.includes('keywords')||n.includes('tags')||n.includes('director')||n.includes('actor')||n.includes('cast')) map[i]='nomcle';
       });
 
-      rows = body.filter(r=>r.some(c=>String(c).trim()!=='')).map(r=>{
-        const o={}; Columns.forEach(c=>{ if(c.key!=='_actions') o[c.key]=(c.type==='bool'?false:''); });
-        r.forEach((cell,i)=>{
-          const key=map[i]; if(!key) return;
-          if(key==='guerre'){
-            const v=String(cell).trim().toLowerCase();
-            o.guerre = (v.includes('ww1')||v.includes('14-18')||v.includes('1914')) ? 'WW1'
+      rows = body
+        .filter(r=>r.some(c=>String(c).trim()!==''))
+        .map(r=>{
+          const o={};
+          Columns.forEach(c=>{ if(c.key!=='_actions') o[c.key]=(c.type==='bool'?false:''); });
+          r.forEach((cell,i)=>{
+            const key=map[i]; if(!key) return;
+            if(key==='guerre'){
+              const v=String(cell).trim().toLowerCase();
+              o.guerre = (v.includes('ww1')||v.includes('14-18')||v.includes('1914')) ? 'WW1'
                    : (v.includes('ww2')||v.includes('39-45')||v.includes('194')) ? 'WW2'
-                   : (v===''||v==='non' ? '' : 'Autres');
-          } else if(Columns.find(c=>c.key===key)?.type==='bool'){
-            const v=String(cell).trim().toLowerCase();
-            o[key]=['1','oui','yes','true','vrai','x','✓'].includes(v);
-          } else if(key==='numero'){ o.numero = String(cell).replace(/[^\d]/g,''); }
-          else { o[key]=String(cell).trim(); }
+                   : (v===''||v==='non'||v==='0'||v==='false' ? '' : 'Autres');
+            } else if(Columns.find(c=>c.key===key)?.type==='bool'){
+              const v=String(cell).trim().toLowerCase();
+              o[key]=['1','oui','yes','true','vrai','x','✓'].includes(v);
+            } else if(key==='numero'){
+              o.numero = String(cell).replace(/[^\d]/g,'');
+            } else {
+              o[key]=String(cell).trim();
+            }
+          });
+          return o;
         });
-        return o;
-      });
 
-      // auto-numérotation
+      // auto-numérotation si Nº manquant
       let max=rows.reduce((m,r)=>Math.max(m,parseInt(r.numero||0,10)||0),0);
       rows.forEach(r=>{ if(!r.numero){ max+=1; r.numero=String(max); } });
 
-      buildHeader(); render(); if(statsOpen()) renderStats(); toast('CSV importé');
+      saveLocal(); buildHeader(); render(); if(statsOpen()) renderStats(); toast('CSV importé');
     });
   });
 
-  /* ===== Ajouter / Tout effacer ===== */
+  /* ===== Ajouter / Effacer ===== */
   byId('btnAdd').addEventListener('click', ()=>{
     const max=rows.reduce((m,r)=>Math.max(m,parseInt(r.numero||0,10)||0),0);
     rows.unshift({
@@ -398,11 +390,13 @@ document.addEventListener('DOMContentLoaded', () => {
       guerre:'', animaux:false, disney:false, horreur:false, enfants:false, famille:false, histoire:false, autres:false,
       nomcle:''
     });
-    render(); if(statsOpen()) renderStats(); toast('Ligne ajoutée');
+    saveLocal(); render(); if(statsOpen()) renderStats(); toast('Ligne ajoutée');
   });
+
   byId('btnClearAll').addEventListener('click', ()=>{
     if(confirm('Confirmer : effacer TOUT le tableau ? Cette action est irréversible.')){
-      rows=[]; render(); if(statsOpen()) renderStats(); toast('Toutes les lignes ont été effacées');
+      rows=[]; localStorage.removeItem(STORAGE_KEY);
+      render(); if(statsOpen()) renderStats(); toast('Tout effacé');
     }
   });
 
@@ -422,7 +416,10 @@ document.addEventListener('DOMContentLoaded', () => {
   function statsOpen(){ return statsEl.classList.contains('open'); }
   byId('btnSettings').addEventListener('click', ()=> byId('sheet').classList.toggle('open'));
   byId('cbCompact').addEventListener('change', e=>{ document.body.style.fontSize = e.target.checked ? '14px' : '15px'; });
-  byId('cbNarrowNo').addEventListener('change', e=>{ const w=e.target.checked?'64px':'90px'; document.querySelectorAll('th.sticky, td.sticky').forEach(el=> el.style.width=w); });
+  byId('cbNarrowNo').addEventListener('change', e=>{
+    const w=e.target.checked?'64px':'90px';
+    document.querySelectorAll('th.sticky, td.sticky').forEach(el=> el.style.width=w);
+  });
 
   function renderStats(){
     const themesBody=byId('statsThemes'); const guerreBody=byId('statsGuerre');
@@ -433,42 +430,43 @@ document.addEventListener('DOMContentLoaded', () => {
 
     boolCols.forEach(key=>{
       const label=Columns.find(c=>c.key===key).label; const val=counts[key]||0;
-      themesBody.appendChild(metric(label,val,total,val/max*100));
+      const line=document.createElement('div'); line.className='metric';
+      const l=document.createElement('div'); l.className='label'; l.textContent=label;
+      const bar=document.createElement('div'); bar.className='bar';
+      const fill=document.createElement('i'); fill.style.width=(Math.max(0,Math.min(100,(val/max*100)))).toFixed(1)+'%';
+      bar.appendChild(fill);
+      const v=document.createElement('div'); v.className='val'; v.textContent = `${val} / ${total}`;
+      line.appendChild(l); line.appendChild(bar); line.appendChild(v);
+      themesBody.appendChild(line);
     });
+
     const g={WW1:0,WW2:0,Autres:0,'(vide)':0};
-    rows.forEach(r=>{ const v=(r.guerre||'').trim(); if(v==='WW1')g.WW1++; else if(v==='WW2')g.WW2++; else if(v==='Autres')g.Autres++; else g['(vide)']++; });
-    ['WW1','WW2','Autres','(vide)'].forEach(k=>{ guerreBody.appendChild(metric('Guerre '+k, g[k], total, (g[k]/total)*100)); });
-
-    const chips=document.createElement('div'); chips.className='chips';
-    chips.appendChild(chip(`Total: ${rows.length}`));
-    chips.appendChild(chip(`Famille (Oui): ${counts.famille||0}`));
-    chips.appendChild(chip(`Enfants (Oui): ${counts.enfants||0}`));
-    chips.appendChild(chip(`Disney (Oui): ${counts.disney||0}`));
-    guerreBody.appendChild(chips);
+    rows.forEach(r=>{
+      const v=(r.guerre||'').trim();
+      if(v==='WW1') g.WW1++; else if(v==='WW2') g.WW2++; else if(v==='Autres') g.Autres++; else g['(vide)']++;
+    });
+    ['WW1','WW2','Autres','(vide)'].forEach(k=>{
+      const line=document.createElement('div'); line.className='metric';
+      const l=document.createElement('div'); l.className='label'; l.textContent='Guerre '+k;
+      const bar=document.createElement('div'); bar.className='bar';
+      const fill=document.createElement('i'); fill.style.width=(g[k]/total*100).toFixed(1)+'%';
+      bar.appendChild(fill);
+      const v=document.createElement('div'); v.className='val'; v.textContent=`${g[k]} / ${total}`;
+      line.appendChild(l); line.appendChild(bar); line.appendChild(v);
+      guerreBody.appendChild(line);
+    });
   }
-  function metric(label,val,total,pct){
-    const line=document.createElement('div'); line.className='metric';
-    const l=document.createElement('div'); l.className='label'; l.textContent=label;
-    const bar=document.createElement('div'); bar.className='bar';
-    const fill=document.createElement('i'); fill.style.width=Math.max(0,Math.min(100,pct)).toFixed(1)+'%';
-    bar.appendChild(fill);
-    const v=document.createElement('div'); v.className='val'; v.textContent=`${val} / ${total}`;
-    line.appendChild(l); line.appendChild(bar); line.appendChild(v);
-    return line;
-  }
-  function chip(txt){ const s=document.createElement('span'); s.className='chip'; s.textContent=txt; return s; }
 
-  /* ===== Utilitaires ===== */
+  /* ===== Utils ===== */
   function btn(txt,title,fn){ const b=document.createElement('button'); b.className='icon-btn'; b.textContent=txt; b.title=title; b.type='button'; b.onclick=fn; return b; }
   function byId(id){ return document.getElementById(id); }
-  function toast(msg){ const t=byId('toast'); t.textContent=msg; t.classList.add('show'); clearTimeout(toast._timer); toast._timer=setTimeout(()=>t.classList.remove('show'),1600); }
-
-  // mini parseur CSV pour import (avec détection de séparateur)
+  function toast(msg){ const t=byId('toast'); t.textContent=msg; t.classList.add('show'); clearTimeout(toast._timer); toast._timer=setTimeout(()=>t.classList.remove('show'), 1500); }
+  function norm(s){ return String(s||'').trim().toLowerCase().replace(/[áàâä]/g,'a').replace(/[éèêë]/g,'e').replace(/[îïìí]/g,'i').replace(/[ôöòó]/g,'o').replace(/[ûüùú]/g,'u').replace(/ç/g,'c').replace(/[º°]/g,'o').replace(/\./g,'').replace(/\s+/g,' '); }
   function detectDelimiter(sample){
     const line=(sample.split(/\r?\n/)[0]||sample);
     const candidates=[';',',','\t','|'];
-    let best=',',bestCount=0;
-    for(const d of candidates){ const c=line.split(d).length; if(c>bestCount){ bestCount=c; best=d; } }
+    let best=';',bestCount=0;
+    for(const d of candidates){ const n=line.split(d).length; if(n>bestCount){ bestCount=n; best=d; } }
     return best;
   }
   function parseCSV(text,delim){
@@ -491,13 +489,19 @@ document.addEventListener('DOMContentLoaded', () => {
     return out;
   }
 
-  /* ===== Démo initiale ===== */
-  rows=[
-    { numero:'1',  titre:'Le Voyage de Chihiro', voyage:true, aviation:false, animation:true,  aventure:true,  sf:false, explor:false, guerre:'',    animaux:true,  disney:false, horreur:false, enfants:true,  famille:true,  histoire:false, autres:false, nomcle:'Miyazaki' },
-    { numero:'2',  titre:'Dunkerque',            voyage:false,aviation:true,  animation:false, aventure:false, sf:false, explor:false, guerre:'WW2', animaux:false, disney:false, horreur:false, enfants:false, famille:false, histoire:true,  autres:false, nomcle:'Christopher Nolan' },
-    { numero:'42', titre:'Interstellar',         voyage:false,aviation:false, animation:false, aventure:true,  sf:true,  explor:true,  guerre:'',    animaux:false, disney:false, horreur:false, enfants:false, famille:false, histoire:false,autres:false, nomcle:'Matthew McConaughey; Nolan' },
-    { numero:'7',  titre:'Les Sentiers de la gloire', voyage:false,aviation:false, animation:false, aventure:false, sf:false, explor:false, guerre:'WW1', animaux:false, disney:false, horreur:false, enfants:false, famille:false, histoire:true, autres:false, nomcle:'Kubrick' }
-  ];
+  /* ===== Initialisation ===== */
+  const saved = loadLocal();
+  if(saved){ rows = saved; }
+  else {
+    rows=[
+      { numero:'1',  titre:'Le Voyage de Chihiro', voyage:true, aviation:false, animation:true,  aventure:true,  sf:false, explor:false, guerre:'',    animaux:true,  disney:false, horreur:false, enfants:true,  famille:true,  histoire:false, autres:false, nomcle:'Miyazaki' },
+      { numero:'2',  titre:'Dunkerque',            voyage:false,aviation:true,  animation:false, aventure:false, sf:false, explor:false, guerre:'WW2', animaux:false, disney:false, horreur:false, enfants:false, famille:false, histoire:true,  autres:false, nomcle:'Christopher Nolan' },
+      { numero:'42', titre:'Interstellar',         voyage:false,aviation:false, animation:false, aventure:true,  sf:true,  explor:true,  guerre:'',    animaux:false, disney:false, horreur:false, enfants:false, famille:false, histoire:false,autres:false, nomcle:'Matthew McConaughey; Nolan' },
+      { numero:'7',  titre:'Les Sentiers de la gloire', voyage:false,aviation:false, animation:false, aventure:false, sf:false, explor:false, guerre:'WW1', animaux:false, disney:false, horreur:false, enfants:false, famille:false, histoire:true, autres:false, nomcle:'Kubrick' }
+    ];
+    saveLocal();
+  }
+
   buildHeader(); render();
 });
 </script>
