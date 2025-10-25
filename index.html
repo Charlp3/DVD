@@ -3,22 +3,81 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
-<title>DVD — Gestion CSV (v2.2.0)</title>
+<title>DVD</title>
 <meta name="theme-color" content="#22c55e">
 <style>
 :root{
-  --bg:#fdf8e5;--panel:#fffdf5;--border:#e7dca8;
-  --text:#3a2e0a;--muted:#7a6b3a;
-  --accent:#22c55e;--accent-2:#16a34a;
-  --shadow:0 4px 16px rgba(0,0,0,.1);--radius:10px;
+  --bg:#fdf8e5;
+  --panel:#fffdf5;
+  --border:#e7dca8;
+  --text:#3a2e0a;
+  --accent:#22c55e;
+  --shadow:0 4px 16px rgba(0,0,0,.1);
+  --sticky-bg:#fffce6;
 }
-html,body{margin:0;height:100%;font-family:system-ui,-apple-system,Segoe UI,Roboto;background:var(--bg);color:var(--text);}
-header{background:linear-gradient(180deg,#fffbea,#f3e9b5);border-bottom:1px solid var(--border);box-shadow:0 2px 5px rgba(0,0,0,.05);position:sticky;top:0;z-index:20;}
-.wrap{max-width:1200px;margin:0 auto;padding:12px 16px;}
-h1{margin:0;font-size:20px;color:#3a2e0a;font-weight:700}
-.toolbar{display:flex;flex-wrap:wrap;gap:.5rem;align-items:center;margin-top:10px}
+html,body{
+  margin:0;
+  height:100%;
+  font-family:system-ui,-apple-system,Segoe UI,Roboto;
+  background:var(--bg);
+  color:var(--text);
+}
 
-/* Boutons principaux verts */
+/* HEADER */
+header{
+  background:linear-gradient(180deg,#fffbea,#f3e9b5);
+  border-bottom:1px solid var(--border);
+  box-shadow:0 2px 5px rgba(0,0,0,.05);
+  position:sticky;
+  top:0;
+  z-index:20;
+}
+.wrap{
+  max-width:1200px;
+  margin:0 auto;
+  padding:12px 16px;
+}
+h1{
+  margin:0;
+  font-size:20px;
+  font-weight:700;
+  color:#3a2e0a;
+  line-height:1.2;
+  display:flex;
+  align-items:center;
+  flex-wrap:wrap;
+  gap:.5rem;
+}
+.header-meta{
+  font-size:12px;
+  color:#6b5a1d;
+  font-weight:500;
+  margin-top:2px;
+}
+#filmCount{
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  background:#a7d0ff;
+  color:#0c3a5e;
+  border-radius:50%;
+  font-weight:700;
+  width:26px;
+  height:26px;
+  font-size:13px;
+  line-height:1;
+  box-shadow:0 1px 3px rgba(0,0,0,.15);
+}
+
+/* toolbar buttons row */
+.toolbar{
+  display:flex;
+  flex-wrap:wrap;
+  row-gap:.5rem;
+  column-gap:.5rem;
+  align-items:center;
+  margin-top:10px;
+}
 .btn{
   appearance:none;
   border:1px solid rgba(22,163,74,.4);
@@ -30,27 +89,23 @@ h1{margin:0;font-size:20px;color:#3a2e0a;font-weight:700}
   cursor:pointer;
   transition:.2s transform,.2s background;
   box-shadow:var(--shadow);
+  font-size:14px;
+  line-height:1.2;
 }
 .btn:hover{
   transform:translateY(-1px);
   background:linear-gradient(180deg,rgba(34,197,94,.35),rgba(22,163,74,.25));
 }
-
-/* Jaune secondaire */
 .btn.secondary{
   border:1px solid #d6b54a;
   background:linear-gradient(180deg,#fff1b8,#f9e58a);
   color:#3a2e0a;
 }
-
-/* Rouge pastel danger */
 .btn.danger{
   border:1px solid #f87171;
   background:linear-gradient(180deg,#ffe4e6,#fecaca);
   color:#7f1d1d;
 }
-
-/* Bouton verrou vert/rouge pastel */
 .btn.lock-toggle.unlocked{
   border:1px solid rgba(22,163,74,.4);
   background:linear-gradient(180deg,rgba(34,197,94,.25),rgba(22,163,74,.15));
@@ -61,36 +116,61 @@ h1{margin:0;font-size:20px;color:#3a2e0a;font-weight:700}
   background:linear-gradient(180deg,#ffe4e6,#fecaca);
   color:#7f1d1d;
 }
-
 .btn[disabled],
 .icon-btn[disabled]{
   opacity:.5;
   cursor:not-allowed;
   filter:grayscale(1);
 }
-
 input[type="file"]{display:none}
 
-.filters{display:flex;gap:.35rem;flex-wrap:wrap;margin-left:auto}
+/* filtres WW1/WW2/etc */
+.filters{
+  display:flex;
+  flex-wrap:wrap;
+  gap:.4rem;
+  margin-left:auto;
+}
 .chipbtn{
   border:1px solid #e5d58e;
   background:#fff7cf;
   color:#5f4f19;
-  padding:.3rem .6rem;
+  padding:.4rem .6rem;
   border-radius:999px;
   cursor:pointer;
-  font-weight:600
+  font-weight:600;
+  font-size:14px;
+  line-height:1.2;
 }
-.chipbtn.active{border-color:#b79a2e;background:#ffe98a}
-.chipbtn[data-v="WW1"]{background:#eaf4ff;border-color:#b9d6ff}
-.chipbtn[data-v="WW2"]{background:#eef6d3;border-color:#cfe7a5}
-.chipbtn[data-v="Autres"]{background:#f2f2f2;border-color:#dedede}
+.chipbtn.active{
+  border-color:#b79a2e;
+  background:#ffe98a;
+}
+.chipbtn[data-v="WW1"]{background:#eaf4ff;border-color:#b9d6ff;color:#113a74;}
+.chipbtn[data-v="WW2"]{background:#eef6d3;border-color:#cfe7a5;color:#3c4b1f;}
+.chipbtn[data-v="Autres"]{background:#f2f2f2;border-color:#dedede;color:#4b5563;}
 
-.panel{margin:12px auto;background:var(--panel);border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow)}
-.table-wrap{overflow:auto;max-height:calc(100vh - 300px)}
-table{border-collapse:separate;border-spacing:0;width:100%;min-width:1000px}
+/* PANEL / TABLE */
+.panel{
+  margin:12px auto;
+  background:var(--panel);
+  border:1px solid var(--border);
+  border-radius:10px;
+  box-shadow:var(--shadow);
+}
+.table-wrap{
+  overflow:auto;
+  max-height:calc(100vh - 300px);
+}
+table{
+  border-collapse:separate;
+  border-spacing:0;
+  width:100%;
+  min-width:1000px;
+}
 thead th{
-  position:sticky;top:0;
+  position:sticky;
+  top:0;
   background:#fff8dc;
   border-bottom:2px solid var(--border);
   padding:.5rem;
@@ -98,120 +178,291 @@ thead th{
   user-select:none;
   font-weight:600;
   color:#3a2e0a;
+  z-index:10;
+  font-size:14px;
+  line-height:1.2;
+  white-space:nowrap;
 }
-thead th.sortable{cursor:pointer}
-thead th .sortmark{color:#6b5a1d;font-size:12px;margin-left:.35rem}
-tbody td{border-bottom:1px solid #efe3b5;padding:.4rem .5rem;vertical-align:middle}
-tbody tr:hover td{background:#fffbe1}
-th.sticky,td.sticky{
-  position:sticky;left:0;
-  background:#fffce6;
+thead th.sortable{cursor:pointer;}
+thead th .sortmark{
+  color:#6b5a1d;
+  font-size:12px;
+  margin-left:.35rem;
+}
+tbody td{
+  border-bottom:1px solid #efe3b5;
+  padding:.4rem .5rem;
+  vertical-align:middle;
+  background:#fffdf5;
+  font-size:14px;
+  line-height:1.3;
+}
+tbody tr:hover td{
+  background:#fffbe1;
+}
+
+/* Sticky Nº + Titre */
+th.sticky-num,
+td.sticky-num{
+  position:sticky;
+  left:0;
+  background:var(--sticky-bg);
   border-right:1px solid var(--border);
-  z-index:5
+  z-index:15;
+  min-width:50px;
+  width:50px;
+  max-width:60px;
+  text-align:center;
+  font-variant-numeric:tabular-nums;
 }
-.row-actions{display:flex;gap:.35rem;justify-content:flex-end}
+th.sticky-title,
+td.sticky-title{
+  position:sticky;
+  left:50px; /* = largeur réelle de Nº sur mobile */
+  background:var(--sticky-bg);
+  border-right:1px solid var(--border);
+  z-index:14;
+  min-width:140px;
+  max-width:200px;
+  width:170px;
+  /* autoriser retour à la ligne */
+  white-space:normal;
+  word-break:break-word;
+  overflow-wrap:break-word;
+  line-height:1.3;
+  font-size:14px;
+}
+
+/* ligne actions */
+.row-actions{
+  display:flex;
+  gap:.35rem;
+  justify-content:flex-end;
+}
 .icon-btn{
   border:1px solid rgba(22,163,74,.4);
   color:#0b4f27;
   background:linear-gradient(180deg,rgba(34,197,94,.2),rgba(22,163,74,.12));
-  width:30px;height:30px;border-radius:8px;cursor:pointer
+  width:30px;
+  height:30px;
+  border-radius:8px;
+  cursor:pointer;
+  font-size:15px;
+  line-height:30px;
+  text-align:center;
 }
-.icon-btn:hover{background:linear-gradient(180deg,rgba(34,197,94,.3),rgba(22,163,74,.2))}
-.icon-btn[disabled]:hover{background:linear-gradient(180deg,rgba(34,197,94,.2),rgba(22,163,74,.12))}
+.icon-btn:hover{
+  background:linear-gradient(180deg,rgba(34,197,94,.3),rgba(22,163,74,.2));
+}
+.icon-btn[disabled]:hover{
+  background:linear-gradient(180deg,rgba(34,197,94,.2),rgba(22,163,74,.12));
+}
 
-.boolean input[type="checkbox"]{width:18px;height:18px;accent-color:var(--accent)}
-.boolean input[type="checkbox"][disabled]{accent-color:#bbb !important;filter:grayscale(1);}
+/* checkboxes */
+.boolean input[type="checkbox"]{
+  width:18px;
+  height:18px;
+  accent-color:var(--accent);
+}
+.boolean input[type="checkbox"][disabled]{
+  accent-color:#bbb !important;
+  filter:grayscale(1);
+}
 
-.num{font-variant-numeric:tabular-nums}
-
+/* pastilles guerre */
 .badge{
   display:inline-block;
   padding:.15rem .45rem;
   border-radius:999px;
   font-size:12px;
   border:1px solid transparent;
-  margin-left:.35rem
+  margin-left:.35rem;
 }
-.badge-ww1{background:#eaf4ff;border-color:#b9d6ff;color:#113a74}
-.badge-ww2{background:#eef6d3;border-color:#cfe7a5;color:#3c4b1f}
-.badge-autres{background:#f2f2f2;border-color:#dedede;color:#4b5563}
+.badge-ww1{background:#eaf4ff;border-color:#b9d6ff;color:#113a74;}
+.badge-ww2{background:#eef6d3;border-color:#cfe7a5;color:#3c4b1f;}
+.badge-autres{background:#f2f2f2;border-color:#dedede;color:#4b5563;}
 
+/* FOOTER */
 .footer{
-  display:flex;justify-content:space-between;align-items:center;
-  padding:10px 14px;font-size:14px;color:#4b3f16;
-  background:#fff9d3;border-top:1px solid var(--border)
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  padding:10px 14px;
+  font-size:14px;
+  color:#4b3f16;
+  background:#fff9d3;
+  border-top:1px solid var(--border);
 }
 
+/* STATS PANEL */
 .stats{
   display:none;
   grid-template-columns:1fr 1fr;
   gap:16px;
   margin:10px auto;
   max-width:1200px;
-  padding:0 16px 16px
+  padding:0 16px 16px;
 }
-.stats.open{display:grid;animation:fadeIn .18s ease-out}
+.stats.open{
+  display:grid;
+  animation:fadeIn .18s ease-out;
+}
 .card{
-  background:#fffef6;border:1px solid var(--border);
-  border-radius:10px;box-shadow:var(--shadow)
+  background:#fffef6;
+  border:1px solid var(--border);
+  border-radius:10px;
+  box-shadow:var(--shadow);
 }
 .card h3{
-  margin:0;padding:10px 12px;
+  margin:0;
+  padding:10px 12px;
   font-size:15px;
   background:#fff7cf;
-  border-bottom:1px solid var(--border)
+  border-bottom:1px solid var(--border);
+  color:#3a2e0a;
+  line-height:1.2;
 }
-.card .body{padding:10px 12px}
-.metric{display:flex;align-items:center;gap:10px;margin:8px 0}
-.metric .label{min-width:150px;color:#5a4a17}
+.card .body{
+  padding:10px 12px;
+  font-size:14px;
+  line-height:1.3;
+}
+.metric{
+  display:flex;
+  align-items:center;
+  gap:10px;
+  margin:8px 0;
+}
+.metric .label{
+  min-width:150px;
+  color:#5a4a17;
+  font-size:14px;
+}
 .bar{
-  flex:1;height:12px;border-radius:999px;
-  background:#fff2b8;border:1px solid #eed26a;
-  overflow:hidden
+  flex:1;
+  height:12px;
+  border-radius:999px;
+  background:#fff2b8;
+  border:1px solid #eed26a;
+  overflow:hidden;
 }
 .bar i{
-  display:block;height:100%;
+  display:block;
+  height:100%;
   background:linear-gradient(90deg,#22c55e,#16a34a);
-  width:0%
+  width:0%;
 }
-.val{font-variant-numeric:tabular-nums;color:#3a2e0a}
+.val{
+  font-variant-numeric:tabular-nums;
+  color:#3a2e0a;
+  font-size:14px;
+}
 
-.settings{position:fixed;right:16px;bottom:16px}
+/* PARAMÈTRES (sheet) */
+.settings{
+  position:fixed;
+  right:16px;
+  bottom:16px;
+}
 .sheet{
-  position:fixed;right:16px;bottom:70px;
-  width:320px;max-width:90vw;
-  background:#fffdf0;border:1px solid var(--border);
-  border-radius:10px;box-shadow:var(--shadow);
-  padding:12px 14px;display:none
-}
-.sheet.open{display:block;animation:fadeIn .2s ease-out}
-
-#toast{
-  position:fixed;left:50%;bottom:18px;
-  transform:translateX(-50%);
-  background:#f0fdf4;color:#14532d;
-  border:1px solid #86efac;
-  padding:10px 14px;border-radius:8px;
+  position:fixed;
+  right:16px;
+  bottom:70px;
+  width:320px;
+  max-width:90vw;
+  background:#fffdf0;
+  border:1px solid var(--border);
+  border-radius:10px;
   box-shadow:var(--shadow);
-  opacity:0;transition:opacity .2s ease;
-  z-index:99
+  padding:12px 14px;
+  display:none;
+  font-size:14px;
+  line-height:1.4;
 }
-#toast.show{opacity:1}
+.sheet.open{
+  display:block;
+  animation:fadeIn .2s ease-out;
+}
+.sheet h3{
+  margin:0 0 .75rem 0;
+  font-size:15px;
+  color:#3a2e0a;
+}
+.sheet .field{
+  margin-bottom:.5rem;
+  color:#3a2e0a;
+  display:flex;
+  align-items:center;
+  gap:.5rem;
+  font-size:14px;
+}
+
+/* TOAST */
+#toast{
+  position:fixed;
+  left:50%;
+  bottom:18px;
+  transform:translateX(-50%);
+  background:#f0fdf4;
+  color:#14532d;
+  border:1px solid #86efac;
+  padding:10px 14px;
+  border-radius:8px;
+  box-shadow:var(--shadow);
+  opacity:0;
+  transition:opacity .2s ease;
+  z-index:99;
+  font-size:14px;
+  line-height:1.3;
+}
+#toast.show{opacity:1;}
 
 @keyframes fadeIn{
   from{opacity:0;transform:translateY(5px);}
   to{opacity:1;transform:translateY(0);}
 }
+
+/* iPhone affinement */
 @media(max-width:480px){
-  body{font-size:14px}
-  table{min-width:900px}
+  body{font-size:14px;}
+  table{min-width:900px;} /* un peu moins large */
+  th.sticky-num,
+  td.sticky-num{
+    min-width:44px;
+    width:44px;
+    max-width:50px;
+  }
+  th.sticky-title,
+  td.sticky-title{
+    left:44px; /* aligne après Nº */
+    min-width:130px;
+    max-width:150px;
+    width:140px;
+    font-size:14px;
+    line-height:1.3;
+    padding-right:.5rem;
+    padding-left:.5rem;
+  }
+  #filmCount{
+    width:22px;
+    height:22px;
+    font-size:12px;
+  }
 }
 </style>
 </head>
 <body>
+
 <header>
   <div class="wrap">
-    <h1>DVD — Gestion CSV</h1>
+    <h1>
+      DVD
+      <span id="filmCount">0</span>
+    </h1>
+    <div class="header-meta">
+      © Pierre Charlier 2025 • v<span id="versionTop"></span>
+    </div>
+
     <div class="toolbar">
       <label class="btn" for="fileInput">📂 Importer CSV</label>
       <input id="fileInput" type="file" accept=".csv,text/csv" />
@@ -224,7 +475,6 @@ th.sticky,td.sticky{
       <button class="btn" id="btnStats" type="button">📊 Statistiques</button>
       <button class="btn" id="btnSettings" type="button">⚙️ Paramètres</button>
 
-      <!-- Filtres Guerre -->
       <div class="filters" id="guerreFilters" aria-label="Filtre Guerre">
         <button class="chipbtn active" data-v="ALL" type="button">Tous</button>
         <button class="chipbtn" data-v="WW1" type="button">WW1</button>
@@ -245,7 +495,7 @@ th.sticky,td.sticky{
   </div>
   <div class="footer">
     <div><span id="countShown">0</span> / <span id="countTotal">0</span> éléments</div>
-    <div>© Pierre Charlier 2025 • v<span id="version"></span></div>
+    <div>Dernier état : <span id="lockStateLabel"></span></div>
   </div>
 </div>
 
@@ -271,7 +521,7 @@ th.sticky,td.sticky{
     <div class="field">
       <label><input type="checkbox" id="cbNarrowNo" checked> Colonne Nº étroite</label>
     </div>
-    <p>Version <span id="ver2"></span></p>
+    <p>Version <span id="versionSheet"></span></p>
   </div>
 </div>
 
@@ -279,14 +529,23 @@ th.sticky,td.sticky{
 
 <script>
 document.addEventListener('DOMContentLoaded', ()=>{
-  const APP_VERSION='2.2.0';
-  byId('version').textContent=APP_VERSION;
-  byId('ver2').textContent=APP_VERSION;
-
+  const APP_VERSION='2.2.6';
   const STORAGE_KEY='dvd_collection_v2';
+  const LOCK_KEY='dvd_locked';
+
+  const thead=byId('thead');
+  const tbody=byId('tbody');
+  const statsEl=byId('stats');
+  const sheetEl=byId('sheet');
+  const btnLock=byId('btnLock');
+  const filmCount=byId('filmCount');
+
+  byId('versionTop').textContent=APP_VERSION;
+  byId('versionSheet').textContent=APP_VERSION;
+
   const Columns=[
-   {key:'numero',label:'Nº',type:'number',sticky:true,sortable:true},
-   {key:'titre',label:'Titre',type:'text',sortable:true},
+   {key:'numero',label:'Nº',type:'number',sticky:'num',sortable:true},
+   {key:'titre',label:'Titre',type:'text',sticky:'title',sortable:true},
    {key:'voyage',label:'Voyage',type:'bool',sortable:true},
    {key:'aviation',label:'Aviation',type:'bool',sortable:true},
    {key:'animation',label:'Animation',type:'bool',sortable:true},
@@ -305,44 +564,48 @@ document.addEventListener('DOMContentLoaded', ()=>{
    {key:'_actions',label:'',type:'actions',sortable:false}
   ];
 
-  let rows=[];
-  let sortState={ key:'numero', dir:'asc' };
-  let guerreFilter='ALL';
-  let locked=false; // 🔒 nouvel état global
-
-  const thead=byId('thead');
-  const tbody=byId('tbody');
-  const btnLock=byId('btnLock');
-
-  /* ===== Local Storage ===== */
-  function saveLocal(){ try{ localStorage.setItem(STORAGE_KEY, JSON.stringify(rows)); }catch(e){ console.warn(e); } }
-  function loadLocal(){
-    try{
-      const s=localStorage.getItem(STORAGE_KEY);
-      if(!s) return null;
-      const data=JSON.parse(s);
-      if(Array.isArray(data)) return data;
-    }catch(e){ console.warn(e); }
-    return null;
+  let rows = loadLocal();
+  if(!rows || !Array.isArray(rows) || !rows.length){
+    rows=[
+      { numero:'1',  titre:'Le Voyage de Chihiro', voyage:true, aviation:false, animation:true,  aventure:true,  sf:false, explor:false, guerre:'',    animaux:true,  disney:false, horreur:false, enfants:true,  famille:true,  histoire:false, autres:false, nomcle:'Miyazaki' },
+      { numero:'2',  titre:'Dunkerque',            voyage:false,aviation:true,  animation:false, aventure:false, sf:false, explor:false, guerre:'WW2', animaux:false, disney:false, horreur:false, enfants:false, famille:false, histoire:true,  autres:false, nomcle:'Christopher Nolan' },
+      { numero:'42', titre:'Interstellar',         voyage:false,aviation:false, animation:false, aventure:true,  sf:true,  explor:true,  guerre:'',    animaux:false, disney:false, horreur:false, enfants:false, famille:false, histoire:false,autres:false, nomcle:'Matthew McConaughey; Nolan' },
+      { numero:'7',  titre:'Les Sentiers de la gloire', voyage:false,aviation:false, animation:false, aventure:false, sf:false, explor:false, guerre:'WW1', animaux:false, disney:false, horreur:false, enfants:false, famille:false, histoire:true, autres:false, nomcle:'Kubrick' }
+    ];
+    saveLocal();
   }
 
-  /* ===== Header + Tri ===== */
+  let sortState={ key:'numero', dir:'asc' };
+  let guerreFilter='ALL';
+
+  // verrou restauré depuis localStorage
+  let locked = loadLockedState();
+  updateLockButton(); // met à jour bouton et label
+
+  /* === BUILD HEADER (avec tri) === */
   function buildHeader(){
     thead.innerHTML='';
     const tr=document.createElement('tr');
     Columns.forEach(c=>{
       const th=document.createElement('th');
       th.textContent=c.label;
-      if(c.sticky){ th.classList.add('sticky'); th.style.width='64px'; }
+      if(c.sticky==='num'){ th.classList.add('sticky-num'); }
+      if(c.sticky==='title'){ th.classList.add('sticky-title'); }
       if(c.sortable){
         th.classList.add('sortable');
-        const mark=document.createElement('span'); mark.className='sortmark';
+        const mark=document.createElement('span');
+        mark.className='sortmark';
         mark.textContent = (sortState.key===c.key) ? (sortState.dir==='asc'?'▲':'▼') : '▵';
         th.appendChild(mark);
         th.addEventListener('click', ()=>{
-          if(sortState.key===c.key){ sortState.dir = (sortState.dir==='asc'?'desc':'asc'); }
-          else { sortState.key=c.key; sortState.dir='asc'; }
-          buildHeader(); render();
+          if(sortState.key===c.key){
+            sortState.dir = (sortState.dir==='asc'?'desc':'asc');
+          } else {
+            sortState.key=c.key;
+            sortState.dir='asc';
+          }
+          buildHeader();
+          render();
         });
       }
       tr.appendChild(th);
@@ -354,45 +617,59 @@ document.addEventListener('DOMContentLoaded', ()=>{
     let va=a[c.key], vb=b[c.key];
     if(c.key==='guerre'){
       const order={'WW1':1,'WW2':2,'Autres':3,'':4,undefined:4,null:4};
-      va = order[va] ?? 4; vb = order[vb] ?? 4;
+      va = order[va] ?? 4;
+      vb = order[vb] ?? 4;
     } else if(c.type==='number'){
-      va=parseInt(va||'0',10)||0; vb=parseInt(vb||'0',10)||0;
+      va=parseInt(va||'0',10)||0;
+      vb=parseInt(vb||'0',10)||0;
     } else if(c.type==='bool'){
-      va = !!va ? 1 : 0; vb = !!vb ? 1 : 0;
+      va = !!va ? 1 : 0;
+      vb = !!vb ? 1 : 0;
     } else {
-      va = String(va??'').toLowerCase(); vb = String(vb??'').toLowerCase();
+      va = String(va??'').toLowerCase();
+      vb = String(vb??'').toLowerCase();
     }
-    if(va<vb) return -1; if(va>vb) return 1; return 0;
+    if(va<vb) return -1;
+    if(va>vb) return 1;
+    return 0;
   }
 
-  /* ===== LOCK UI STATE ===== */
+  /* === VERROU === */
   function updateLockButton(){
     if(locked){
       btnLock.classList.remove('unlocked');
       btnLock.classList.add('locked');
       btnLock.textContent='🔒 Verrouillé';
+      byId('lockStateLabel').textContent='Verrouillé';
     }else{
       btnLock.classList.remove('locked');
       btnLock.classList.add('unlocked');
       btnLock.textContent='🔓 Édition ON';
+      byId('lockStateLabel').textContent='Édition ON';
     }
   }
+
   btnLock.addEventListener('click',()=>{
     locked=!locked;
+    saveLockedState();
     updateLockButton();
     render();
     toast(locked?'Verrou activé':'Verrou retiré');
   });
 
-  /* ===== Render helpers ===== */
-  function setBadge(el, val){
-    el.textContent = val || '—';
-    el.className='badge';
-    if(val==='WW1') el.classList.add('badge-ww1');
-    else if(val==='WW2') el.classList.add('badge-ww2');
-    else if(val==='Autres') el.classList.add('badge-autres');
+  function saveLockedState(){
+    try{ localStorage.setItem(LOCK_KEY, locked?'1':'0'); }catch(e){}
+  }
+  function loadLockedState(){
+    try{
+      const v=localStorage.getItem(LOCK_KEY);
+      if(v==='1') return true;
+      if(v==='0') return false;
+    }catch(e){}
+    return false;
   }
 
+  /* === RENDER TABLE === */
   function applyFilterIndexed(arrWithIdx){
     if(guerreFilter==='ALL') return arrWithIdx;
     return arrWithIdx.filter(r=>{
@@ -402,37 +679,55 @@ document.addEventListener('DOMContentLoaded', ()=>{
     });
   }
 
-  /* ===== Render (respecte locked) ===== */
+  function setBadge(el, val){
+    el.textContent = val || '—';
+    el.className='badge';
+    if(val==='WW1') el.classList.add('badge-ww1');
+    else if(val==='WW2') el.classList.add('badge-ww2');
+    else if(val==='Autres') el.classList.add('badge-autres');
+  }
+
   function render(){
+    // vue indexée
     const withIdx = rows.map((r,i)=>({ ...r, _idx:i }));
+    // filtre guerre
     const filtered = applyFilterIndexed(withIdx);
+
+    // tri
     const col = Columns.find(c=>c.key===sortState.key) || Columns[0];
     filtered.sort((x,y)=> (cmp(x,y,col)) * (sortState.dir==='asc'?1:-1));
 
+    // rendu tbody
     tbody.innerHTML='';
     filtered.forEach(r=>{
       const tr=document.createElement('tr');
 
       Columns.forEach(c=>{
         const td=document.createElement('td');
-        if(c.sticky){ td.classList.add('sticky'); td.style.width='64px'; }
+
+        // sticky classes
+        if(c.sticky==='num'){ td.classList.add('sticky-num'); }
+        if(c.sticky==='title'){ td.classList.add('sticky-title'); }
 
         if(c.type==='actions'){
           const box=document.createElement('div'); box.className='row-actions';
 
-          const edit=btn('✏️','Éditer',()=>enterRowEdit(tr, rows[r._idx], r._idx));
-          const del =btn('🗑️','Supprimer',()=>{
+          const editBtn=iconBtn('✏️','Éditer',()=>enterRowEdit(tr, rows[r._idx], r._idx));
+          const delBtn =iconBtn('🗑️','Supprimer',()=>{
             rows.splice(r._idx,1);
-            saveLocal(); render(); if(statsOpen()) renderStats(); toast('Ligne supprimée');
+            saveLocal();
+            render();
+            if(statsOpen()) renderStats();
+            toast('Ligne supprimée');
           });
 
           if(locked){
-            edit.disabled=true;
-            del.disabled=true;
+            editBtn.disabled=true;
+            delBtn.disabled=true;
           }
 
-          box.appendChild(edit);
-          box.appendChild(del);
+          box.appendChild(editBtn);
+          box.appendChild(delBtn);
           td.appendChild(box);
 
         } else if(c.type==='bool'){
@@ -440,13 +735,19 @@ document.addEventListener('DOMContentLoaded', ()=>{
           cb.type='checkbox';
           cb.checked=!!r[c.key];
           cb.disabled=locked;
-          cb.onchange=()=>{ rows[r._idx][c.key]=cb.checked; saveLocal(); if(statsOpen()) renderStats(); };
+          cb.onchange=()=>{
+            rows[r._idx][c.key]=cb.checked;
+            saveLocal();
+            if(statsOpen()) renderStats();
+          };
           td.appendChild(cb);
 
         } else if(c.key==='guerre'){
           const sel=document.createElement('select');
           (c.options||['']).forEach(v=>{
-            const o=document.createElement('option');o.value=v;o.text=v;sel.appendChild(o);
+            const o=document.createElement('option');
+            o.value=v;o.text=v;
+            sel.appendChild(o);
           });
           sel.value=r.guerre||'';
 
@@ -459,7 +760,9 @@ document.addEventListener('DOMContentLoaded', ()=>{
           }else{
             sel.onchange=()=>{
               rows[r._idx].guerre=sel.value;
-              saveLocal(); render(); if(statsOpen()) renderStats();
+              saveLocal();
+              render();
+              if(statsOpen()) renderStats();
             };
           }
 
@@ -467,7 +770,6 @@ document.addEventListener('DOMContentLoaded', ()=>{
           td.appendChild(badge);
 
         } else {
-          // cellule texte
           td.textContent=r[c.key]||'';
           if(!locked){
             td.ondblclick=()=>{
@@ -477,35 +779,50 @@ document.addEventListener('DOMContentLoaded', ()=>{
               inp.style.width='100%';
               inp.onblur=()=>{
                 rows[r._idx][c.key]=inp.value;
-                saveLocal(); render(); if(statsOpen()) renderStats();
+                saveLocal();
+                render();
+                if(statsOpen()) renderStats();
               };
               td.innerHTML='';
               td.appendChild(inp);
-              inp.focus(); inp.select();
+              inp.focus();
+              inp.select();
             };
           }
         }
+
         tr.appendChild(td);
       });
 
       tbody.appendChild(tr);
     });
 
+    // compteurs bas + rond en haut
     byId('countShown').textContent=filtered.length;
     byId('countTotal').textContent=rows.length;
-
-    // Si locked => empêcher ajout/suppression globale aussi ?
+    filmCount.textContent=rows.length;
+    // état des boutons globaux
     byId('btnAdd').disabled = locked;
     byId('btnClearAll').disabled = locked;
-    // Import CSV : on laisse actif même si verrou, pour pouvoir recharger une collection -> on peut décider OFF si tu veux le bloquer aussi.
   }
 
-  function enterRowEdit(tr,row,realIndex){
-    if(locked) return; // désactiver entrée en mode édition quand verrouillé
+  function iconBtn(txt,title,fn){
+    const b=document.createElement('button');
+    b.className='icon-btn';
+    b.textContent=txt;
+    b.title=title;
+    b.type='button';
+    b.onclick=fn;
+    return b;
+  }
 
+  /* === EDIT MODE INLINE === */
+  function enterRowEdit(tr,row,realIndex){
+    if(locked) return;
     const cells=tr.querySelectorAll('td');
     Columns.forEach((c,i)=>{
-      const td=cells[i]; if(!td || c.type==='actions') return;
+      const td=cells[i];
+      if(!td || c.type==='actions') return;
       td.innerHTML='';
 
       if(c.type==='bool'){
@@ -543,14 +860,14 @@ document.addEventListener('DOMContentLoaded', ()=>{
 
     const act=tr.lastElementChild;
     act.innerHTML='';
-    act.appendChild(btn('✅','Valider',()=>{
+    act.appendChild(iconBtn('✅','Valider',()=>{
       saveInline(tr,row);
       saveLocal();
       render();
       if(statsOpen()) renderStats();
       toast('Ligne mise à jour');
     }));
-    act.appendChild(btn('↩️','Annuler',()=>render()));
+    act.appendChild(iconBtn('↩️','Annuler',()=>render()));
   }
 
   function saveInline(tr,row){
@@ -558,22 +875,26 @@ document.addEventListener('DOMContentLoaded', ()=>{
     let i=0;
     Columns.forEach(c=>{
       if(c.type==='actions') return;
-      const el=controls[i++]; if(!el) return;
+      const el=controls[i++];
+      if(!el) return;
       if(c.type==='bool') row[c.key]=el.checked;
       else row[c.key]=el.value;
     });
   }
 
-  /* ===== Import CSV ===== */
+  /* === IMPORT CSV === */
   byId('fileInput').addEventListener('change', e=>{
-    const f=e.target.files?.[0]; if(!f) return;
+    const f=e.target.files?.[0];
+    if(!f) return;
     f.text().then(txt=>{
       const delim = detectDelimiter(txt);
       const grid=parseCSV(txt,delim);
       if(grid.length===0) return;
-      const header=grid[0]; const body=grid.slice(1);
 
-      // mapping souple (entêtes variées)
+      const header=grid[0];
+      const body=grid.slice(1);
+
+      // mapping souple
       const map={};
       header.forEach((h,i)=>{
         const n=norm(h);
@@ -600,14 +921,18 @@ document.addEventListener('DOMContentLoaded', ()=>{
         .filter(r=>r.some(c=>String(c).trim()!==''))
         .map(r=>{
           const o={};
-          Columns.forEach(c=>{ if(c.key!=='_actions') o[c.key]=(c.type==='bool'?false:''); });
+          Columns.forEach(c=>{
+            if(c.key!=='_actions') o[c.key]=(c.type==='bool'?false:'');
+          });
           r.forEach((cell,i)=>{
-            const key=map[i]; if(!key) return;
+            const key=map[i];
+            if(!key) return;
             if(key==='guerre'){
               const v=String(cell).trim().toLowerCase();
-              o.guerre = (v.includes('ww1')||v.includes('14-18')||v.includes('1914')) ? 'WW1'
-                   : (v.includes('ww2')||v.includes('39-45')||v.includes('194')) ? 'WW2'
-                   : (v===''||v==='non'||v==='0'||v==='false' ? '' : 'Autres');
+              o.guerre =
+                (v.includes('ww1')||v.includes('14-18')||v.includes('1914')) ? 'WW1' :
+                (v.includes('ww2')||v.includes('39-45')||v.includes('194'))  ? 'WW2' :
+                (v===''||v==='non'||v==='0'||v==='false' ? '' : 'Autres');
             } else if(Columns.find(c=>c.key===key)?.type==='bool'){
               const v=String(cell).trim().toLowerCase();
               o[key]=['1','oui','yes','true','vrai','x','✓'].includes(v);
@@ -624,11 +949,14 @@ document.addEventListener('DOMContentLoaded', ()=>{
       let max=rows.reduce((m,r)=>Math.max(m,parseInt(r.numero||0,10)||0),0);
       rows.forEach(r=>{ if(!r.numero){ max+=1; r.numero=String(max); } });
 
-      saveLocal(); buildHeader(); render(); if(statsOpen()) renderStats(); toast('CSV importé');
+      saveLocal();
+      render();
+      if(statsOpen()) renderStats();
+      toast('CSV importé');
     });
   });
 
-  /* ===== Ajouter / Effacer ===== */
+  /* === AJOUTER / TOUT EFFACER === */
   byId('btnAdd').addEventListener('click', ()=>{
     if(locked){ toast('Déverrouille pour ajouter'); return; }
     const max=rows.reduce((m,r)=>Math.max(m,parseInt(r.numero||0,10)||0),0);
@@ -638,45 +966,29 @@ document.addEventListener('DOMContentLoaded', ()=>{
       guerre:'', animaux:false, disney:false, horreur:false, enfants:false, famille:false, histoire:false, autres:false,
       nomcle:''
     });
-    saveLocal(); render(); if(statsOpen()) renderStats(); toast('Ligne ajoutée');
+    saveLocal();
+    render();
+    if(statsOpen()) renderStats();
+    toast('Ligne ajoutée');
   });
 
   byId('btnClearAll').addEventListener('click', ()=>{
     if(locked){ toast('Déverrouille pour effacer'); return; }
     if(confirm('Confirmer : effacer TOUT le tableau ? Cette action est irréversible.')){
-      rows=[]; localStorage.removeItem(STORAGE_KEY);
-      render(); if(statsOpen()) renderStats(); toast('Tout effacé');
+      rows=[];
+      localStorage.removeItem(STORAGE_KEY);
+      render();
+      if(statsOpen()) renderStats();
+      toast('Tout effacé');
     }
   });
 
-  /* ===== Filtres Guerre ===== */
-  document.querySelectorAll('#guerreFilters .chipbtn').forEach(b=>{
-    b.addEventListener('click', ()=>{
-      document.querySelectorAll('#guerreFilters .chipbtn').forEach(x=>x.classList.remove('active'));
-      b.classList.add('active');
-      guerreFilter = b.dataset.v;
-      render();
-    });
-  });
-
-  /* ===== Stats & Paramètres ===== */
-  const statsEl=byId('stats');
+  /* === STATISTIQUES === */
   byId('btnStats').addEventListener('click', ()=>{
     statsEl.classList.toggle('open');
     if(statsEl.classList.contains('open')) renderStats();
   });
   function statsOpen(){ return statsEl.classList.contains('open'); }
-
-  byId('btnSettings').addEventListener('click', ()=> byId('sheet').classList.toggle('open'));
-
-  byId('cbCompact').addEventListener('change', e=>{
-    document.body.style.fontSize = e.target.checked ? '14px' : '15px';
-  });
-
-  byId('cbNarrowNo').addEventListener('change', e=>{
-    const w=e.target.checked?'64px':'90px';
-    document.querySelectorAll('th.sticky, td.sticky').forEach(el=> el.style.width=w);
-  });
 
   function renderStats(){
     const themesBody=byId('statsThemes');
@@ -684,6 +996,7 @@ document.addEventListener('DOMContentLoaded', ()=>{
     themesBody.innerHTML='';
     guerreBody.innerHTML='';
 
+    // colonnes booléennes
     const boolCols=Columns.filter(c=>c.type==='bool').map(c=>c.key);
     const counts={};
     boolCols.forEach(k=>{
@@ -696,13 +1009,21 @@ document.addEventListener('DOMContentLoaded', ()=>{
     boolCols.forEach(key=>{
       const label=Columns.find(c=>c.key===key).label;
       const val=counts[key]||0;
+
       const line=document.createElement('div'); line.className='metric';
       const l=document.createElement('div'); l.className='label'; l.textContent=label;
+
       const bar=document.createElement('div'); bar.className='bar';
-      const fill=document.createElement('i'); fill.style.width=(Math.max(0,Math.min(100,(val/max*100)))).toFixed(1)+'%';
+      const fill=document.createElement('i');
+      fill.style.width=(Math.max(0,Math.min(100,(val/max*100)))).toFixed(1)+'%';
       bar.appendChild(fill);
-      const v=document.createElement('div'); v.className='val'; v.textContent = `${val} / ${total}`;
-      line.appendChild(l); line.appendChild(bar); line.appendChild(v);
+
+      const v=document.createElement('div'); v.className='val';
+      v.textContent = `${val} / ${total}`;
+
+      line.appendChild(l);
+      line.appendChild(bar);
+      line.appendChild(v);
       themesBody.appendChild(line);
     });
 
@@ -717,27 +1038,49 @@ document.addEventListener('DOMContentLoaded', ()=>{
 
     ['WW1','WW2','Autres','(vide)'].forEach(k=>{
       const line=document.createElement('div'); line.className='metric';
-      const l=document.createElement('div'); l.className='label'; l.textContent='Guerre '+k;
+
+      const l=document.createElement('div'); l.className='label';
+      l.textContent='Guerre '+k;
+
       const bar=document.createElement('div'); bar.className='bar';
-      const fill=document.createElement('i'); fill.style.width=(g[k]/total*100).toFixed(1)+'%';
+      const fill=document.createElement('i');
+      fill.style.width=(g[k]/total*100).toFixed(1)+'%';
       bar.appendChild(fill);
-      const v=document.createElement('div'); v.className='val'; v.textContent=`${g[k]} / ${total}`;
-      line.appendChild(l); line.appendChild(bar); line.appendChild(v);
+
+      const v=document.createElement('div'); v.className='val';
+      v.textContent=`${g[k]} / ${total}`;
+
+      line.appendChild(l);
+      line.appendChild(bar);
+      line.appendChild(v);
       guerreBody.appendChild(line);
     });
   }
 
-  /* ===== Utils ===== */
-  function btn(txt,title,fn){
-    const b=document.createElement('button');
-    b.className='icon-btn';
-    b.textContent=txt;
-    b.title=title;
-    b.type='button';
-    b.onclick=fn;
-    return b;
-  }
+  /* === PARAMÈTRES === */
+  byId('btnSettings').addEventListener('click', ()=>{
+    sheetEl.classList.toggle('open');
+  });
+
+  byId('cbCompact').addEventListener('change', e=>{
+    document.body.style.fontSize = e.target.checked ? '14px' : '15px';
+  });
+
+  byId('cbNarrowNo').addEventListener('change', e=>{
+    // change largeur colonne Nº (sticky-num) et recale la colonne Titre (sticky-title left)
+    const w=e.target.checked?'50px':'70px';
+    document.querySelectorAll('th.sticky-num, td.sticky-num').forEach(el=>{
+      el.style.width=w;
+      el.style.minWidth=w;
+    });
+    document.querySelectorAll('th.sticky-title, td.sticky-title').forEach(el=>{
+      el.style.left=w;
+    });
+  });
+
+  /* === UTILS === */
   function byId(id){ return document.getElementById(id); }
+
   function toast(msg){
     const t=byId('toast');
     t.textContent=msg;
@@ -745,6 +1088,21 @@ document.addEventListener('DOMContentLoaded', ()=>{
     clearTimeout(toast._timer);
     toast._timer=setTimeout(()=>t.classList.remove('show'),1500);
   }
+
+  function saveLocal(){
+    try{ localStorage.setItem(STORAGE_KEY, JSON.stringify(rows)); }
+    catch(e){ console.warn(e); }
+  }
+  function loadLocal(){
+    try{
+      const s=localStorage.getItem(STORAGE_KEY);
+      if(!s) return null;
+      const data=JSON.parse(s);
+      if(Array.isArray(data)) return data;
+    }catch(e){ console.warn(e); }
+    return null;
+  }
+
   function norm(s){
     return String(s||'').trim().toLowerCase()
       .replace(/[áàâä]/g,'a')
@@ -757,6 +1115,8 @@ document.addEventListener('DOMContentLoaded', ()=>{
       .replace(/\./g,'')
       .replace(/\s+/g,' ');
   }
+
+  // détecter ; , tab | automatiquement
   function detectDelimiter(sample){
     const line=(sample.split(/\r?\n/)[0]||sample);
     const candidates=[';',',','\t','|'];
@@ -767,11 +1127,10 @@ document.addEventListener('DOMContentLoaded', ()=>{
     }
     return best;
   }
+
+  // parse CSV support guillemets ""
   function parseCSV(text,delim){
-    const out=[];
-    let row=[];
-    let cur='';
-    let inQ=false;
+    const out=[]; let row=[]; let cur=''; let inQ=false;
     for(let i=0;i<text.length;i++){
       const c=text[i];
       if(inQ){
@@ -785,7 +1144,7 @@ document.addEventListener('DOMContentLoaded', ()=>{
         if(c=='"'){ inQ=true; }
         else if(c===delim){ row.push(cur); cur=''; }
         else if(c=='\n'){ row.push(cur); out.push(row); row=[]; cur=''; }
-        else if(c=='\r'){ /* ignore */ }
+        else if(c=='\r'){ /* skip */ }
         else { cur+=c; }
       }
     }
@@ -794,21 +1153,20 @@ document.addEventListener('DOMContentLoaded', ()=>{
     return out;
   }
 
-  /* ===== Initialisation ===== */
-  const saved = loadLocal();
-  if(saved){ rows = saved; }
-  else {
-    rows=[
-      { numero:'1',  titre:'Le Voyage de Chihiro', voyage:true, aviation:false, animation:true,  aventure:true,  sf:false, explor:false, guerre:'',    animaux:true,  disney:false, horreur:false, enfants:true,  famille:true,  histoire:false, autres:false, nomcle:'Miyazaki' },
-      { numero:'2',  titre:'Dunkerque',            voyage:false,aviation:true,  animation:false, aventure:false, sf:false, explor:false, guerre:'WW2', animaux:false, disney:false, horreur:false, enfants:false, famille:false, histoire:true,  autres:false, nomcle:'Christopher Nolan' },
-      { numero:'42', titre:'Interstellar',         voyage:false,aviation:false, animation:false, aventure:true,  sf:true,  explor:true,  guerre:'',    animaux:false, disney:false, horreur:false, enfants:false, famille:false, histoire:false,autres:false, nomcle:'Matthew McConaughey; Nolan' },
-      { numero:'7',  titre:'Les Sentiers de la gloire', voyage:false,aviation:false, animation:false, aventure:false, sf:false, explor:false, guerre:'WW1', animaux:false, disney:false, horreur:false, enfants:false, famille:false, histoire:true, autres:false, nomcle:'Kubrick' }
-    ];
-    saveLocal();
+  /* === INIT === */
+  function initFilters(){
+    document.querySelectorAll('#guerreFilters .chipbtn').forEach(b=>{
+      b.addEventListener('click', ()=>{
+        document.querySelectorAll('#guerreFilters .chipbtn').forEach(x=>x.classList.remove('active'));
+        b.classList.add('active');
+        guerreFilter = b.dataset.v;
+        render();
+      });
+    });
   }
 
   buildHeader();
-  updateLockButton();
+  initFilters();
   render();
 });
 </script>
