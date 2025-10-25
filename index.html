@@ -358,45 +358,6 @@ td.sticky-title{
   font-size:14px;
 }
 
-/* PARAMÈTRES (sheet) */
-.settings{
-  position:fixed;
-  right:16px;
-  bottom:16px;
-}
-.sheet{
-  position:fixed;
-  right:16px;
-  bottom:70px;
-  width:320px;
-  max-width:90vw;
-  background:#fffdf0;
-  border:1px solid var(--border);
-  border-radius:10px;
-  box-shadow:var(--shadow);
-  padding:12px 14px;
-  display:none;
-  font-size:14px;
-  line-height:1.4;
-}
-.sheet.open{
-  display:block;
-  animation:fadeIn .2s ease-out;
-}
-.sheet h3{
-  margin:0 0 .75rem 0;
-  font-size:15px;
-  color:#3a2e0a;
-}
-.sheet .field{
-  margin-bottom:.5rem;
-  color:#3a2e0a;
-  display:flex;
-  align-items:center;
-  gap:.5rem;
-  font-size:14px;
-}
-
 /* TOAST */
 #toast{
   position:fixed;
@@ -460,7 +421,7 @@ td.sticky-title{
       <span id="filmCount">0</span>
     </h1>
     <div class="header-meta">
-      © Pierre Charlier 2025 • v<span id="versionTop"></span>
+      © Pierre Charlier 2025 • v<span id="versionTop"></span>a
     </div>
 
     <div class="toolbar">
@@ -473,7 +434,6 @@ td.sticky-title{
       <button class="btn lock-toggle unlocked" id="btnLock" type="button">🔓 Édition ON</button>
 
       <button class="btn" id="btnStats" type="button">📊 Statistiques</button>
-      <button class="btn" id="btnSettings" type="button">⚙️ Paramètres</button>
 
       <div class="filters" id="guerreFilters" aria-label="Filtre Guerre">
         <button class="chipbtn active" data-v="ALL" type="button">Tous</button>
@@ -511,20 +471,6 @@ td.sticky-title{
   </div>
 </div>
 
-<!-- Paramètres -->
-<div class="settings">
-  <div class="sheet" id="sheet">
-    <h3>⚙️ Paramètres</h3>
-    <div class="field">
-      <label><input type="checkbox" id="cbCompact"> Mode compact</label>
-    </div>
-    <div class="field">
-      <label><input type="checkbox" id="cbNarrowNo" checked> Colonne Nº étroite</label>
-    </div>
-    <p>Version <span id="versionSheet"></span></p>
-  </div>
-</div>
-
 <div id="toast" role="status" aria-live="polite"></div>
 
 <script>
@@ -536,12 +482,10 @@ document.addEventListener('DOMContentLoaded', ()=>{
   const thead=byId('thead');
   const tbody=byId('tbody');
   const statsEl=byId('stats');
-  const sheetEl=byId('sheet');
   const btnLock=byId('btnLock');
   const filmCount=byId('filmCount');
 
   byId('versionTop').textContent=APP_VERSION;
-  byId('versionSheet').textContent=APP_VERSION;
 
   const Columns=[
    {key:'numero',label:'Nº',type:'number',sticky:'num',sortable:true},
@@ -1057,27 +1001,6 @@ document.addEventListener('DOMContentLoaded', ()=>{
     });
   }
 
-  /* === PARAMÈTRES === */
-  byId('btnSettings').addEventListener('click', ()=>{
-    sheetEl.classList.toggle('open');
-  });
-
-  byId('cbCompact').addEventListener('change', e=>{
-    document.body.style.fontSize = e.target.checked ? '14px' : '15px';
-  });
-
-  byId('cbNarrowNo').addEventListener('change', e=>{
-    // change largeur colonne Nº (sticky-num) et recale la colonne Titre (sticky-title left)
-    const w=e.target.checked?'50px':'70px';
-    document.querySelectorAll('th.sticky-num, td.sticky-num').forEach(el=>{
-      el.style.width=w;
-      el.style.minWidth=w;
-    });
-    document.querySelectorAll('th.sticky-title, td.sticky-title').forEach(el=>{
-      el.style.left=w;
-    });
-  });
-
   /* === UTILS === */
   function byId(id){ return document.getElementById(id); }
 
@@ -1153,7 +1076,6 @@ document.addEventListener('DOMContentLoaded', ()=>{
     return out;
   }
 
-  /* === INIT === */
   function initFilters(){
     document.querySelectorAll('#guerreFilters .chipbtn').forEach(b=>{
       b.addEventListener('click', ()=>{
