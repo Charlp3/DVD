@@ -416,14 +416,14 @@ td.sticky-title{
       <span id="filmCount">0</span>
     </h1>
     <div class="header-meta">
-      © Pierre Charlier 2025 • v2.2.6c
+      © Pierre Charlier 2025 • v2.2.6f
     </div>
 
     <div class="toolbar">
       <label class="btn" for="fileInput">📂 Importer CSV</label>
       <input id="fileInput" type="file" accept=".csv,text/csv" />
 
-      <button class="btn secondary" id="btnExport" type="button">⬇️ Exporter CSV</button>
+      <button class="btn secondary" id="btnExport" type="button">⬇️ Sauvegarder CSV</button>
       <button class="btn secondary" id="btnAdd" type="button">➕ Ajouter</button>
       <button class="btn danger" id="btnClearAll" type="button">🗑️ Tout effacer</button>
 
@@ -471,7 +471,7 @@ td.sticky-title{
 
 <script>
 document.addEventListener('DOMContentLoaded', ()=>{
-  const APP_VERSION='2.2.6c';
+  const APP_VERSION='2.2.6f';
   const STORAGE_KEY='dvd_collection_v2';
   const LOCK_KEY='dvd_locked';
 
@@ -481,7 +481,6 @@ document.addEventListener('DOMContentLoaded', ()=>{
   const btnLock=byId('btnLock');
   const filmCount=byId('filmCount');
 
-  // Définition des colonnes
   const Columns=[
    {key:'numero',label:'Nº',type:'number',sticky:'num',sortable:true},
    {key:'titre',label:'Titre',type:'text',sticky:'title',sortable:true},
@@ -503,7 +502,7 @@ document.addEventListener('DOMContentLoaded', ()=>{
    {key:'_actions',label:'',type:'actions',sortable:false}
   ];
 
-  // Données
+  // Charger les données sauvegardées
   let rows = loadLocal();
   if(!rows || !Array.isArray(rows) || !rows.length){
     rows=[
@@ -515,13 +514,13 @@ document.addEventListener('DOMContentLoaded', ()=>{
     saveLocal();
   }
 
-  // Tri / filtre / verrou
+  // Tri + filtre + verrou
   let sortState={ key:'numero', dir:'asc' };
   let guerreFilter='ALL';
   let locked = loadLockedState();
   updateLockButton();
 
-  /* ===== Construction de l'en-tête avec tri ===== */
+  /* ===== HEADER avec tri ===== */
   function buildHeader(){
     thead.innerHTML='';
     const tr=document.createElement('tr');
@@ -555,7 +554,6 @@ document.addEventListener('DOMContentLoaded', ()=>{
     thead.appendChild(tr);
   }
 
-  /* ===== Comparateur tri ===== */
   function cmp(a,b,c){
     let va=a[c.key], vb=b[c.key];
     if(c.key==='guerre'){
@@ -633,7 +631,7 @@ document.addEventListener('DOMContentLoaded', ()=>{
     });
   }
 
-  /* ===== Affichage pastille Guerre ===== */
+  /* Pastille Guerre */
   function setBadge(el, val){
     el.textContent = val || '—';
     el.className='badge';
@@ -644,13 +642,13 @@ document.addEventListener('DOMContentLoaded', ()=>{
 
   /* ===== Rendu du tableau ===== */
   function render(){
-    // Indexer les lignes (pour garder l'index réel même après tri/filtre)
+    // indexer pour conserver l'index réel
     const indexed = rows.map((r,i)=>({ ...r, _idx:i }));
 
-    // filtre guerre
+    // filtrer
     const filtered = applyFilterIndexed(indexed);
 
-    // tri
+    // trier
     const sortCol = Columns.find(c=>c.key===sortState.key) || Columns[0];
     filtered.sort((a,b)=> (cmp(a,b,sortCol)) * (sortState.dir==='asc'?1:-1));
 
@@ -759,7 +757,6 @@ document.addEventListener('DOMContentLoaded', ()=>{
     byId('countTotal').textContent=rows.length;
     filmCount.textContent=rows.length;
 
-    // état des boutons globaux
     byId('btnAdd').disabled = locked;
     byId('btnClearAll').disabled = locked;
   }
@@ -774,8 +771,8 @@ document.addEventListener('DOMContentLoaded', ()=>{
     return b;
   }
 
-  /* ===== ÉDITION LIGNE COMPLÈTE ===== */
-  function enterRowEdit(tr,row,realIndex){
+  /* ===== ÉDITION LIGNE ===== */
+  function enterRowEdit(tr,row){
     if(locked){toast('Déverrouille pour éditer');return;}
     const cells=tr.querySelectorAll('td');
     Columns.forEach((c,i)=>{
@@ -840,7 +837,7 @@ document.addEventListener('DOMContentLoaded', ()=>{
     });
   }
 
-  /* ===== IMPORT CSV ===== */
+  /* ===== IMPORT CSV (avec détection robuste Nom-clé) ===== */
   byId('fileInput').addEventListener('change', e=>{
     const f=e.target.files?.[0];
     if(!f) return;
@@ -852,7 +849,6 @@ document.addEventListener('DOMContentLoaded', ()=>{
       const header=grid[0];
       const body=grid.slice(1);
 
-      // mapping intelligent: on associe les colonnes CSV aux clés internes
       const map={};
       header.forEach((h,i)=>{
         const n=norm(h);
@@ -872,7 +868,20 @@ document.addEventListener('DOMContentLoaded', ()=>{
         else if(n.includes('famille')||n==='family') map[i]='famille';
         else if(n.includes('histo')) map[i]='histoire';
         else if(n.includes('autres')||n==='autre'||n==='other'||n==='misc') map[i]='autres';
-        else if(n.includes('nom cle')||n.includes('nom-cl')||n.includes('keywords')||n.includes('tags')||n.includes('director')||n.includes('actor')||n.includes('cast')) map[i]='nomcle';
+        else if(
+          n.includes('nom cle') ||
+          n.includes('nom-cle') ||
+          n.includes('nomcle') ||
+          n.includes('nom clé') ||
+          n.includes('nom-clé') ||
+          n.includes('keywords') ||
+          n.includes('tags') ||
+          n.includes('director') ||
+          n.includes('actor') ||
+          n.includes('cast')
+        ){
+          map[i]='nomcle';
+        }
       });
 
       rows = body
@@ -903,7 +912,7 @@ document.addEventListener('DOMContentLoaded', ()=>{
           return o;
         });
 
-      // si pas de numéro, on recalcule
+      // donner un numéro aux lignes qui ont un Nº vide
       let max=rows.reduce((m,r)=>Math.max(m,parseInt(r.numero||0,10)||0),0);
       rows.forEach(r=>{
         if(!r.numero){
@@ -919,8 +928,8 @@ document.addEventListener('DOMContentLoaded', ()=>{
     });
   });
 
-  /* ===== EXPORT CSV ===== */
-  byId('btnExport').addEventListener('click',()=>{
+  /* ===== EXPORT CSV (ouvre dans nouvel onglet pour sauvegarder où tu veux) ===== */
+  byId('btnExport').addEventListener('click', ()=>{
     if(!rows.length){
       toast('Aucune donnée à exporter');
       return;
@@ -957,21 +966,17 @@ document.addEventListener('DOMContentLoaded', ()=>{
       lines.push(vals.join(';'));
     });
 
-    const blob=new Blob([lines.join('\n')],{type:'text/csv;charset=utf-8;'});
-    const url=URL.createObjectURL(blob);
+    const blob=new Blob([lines.join('\n')], {type:'text/csv;charset=utf-8;'});
+    const url = URL.createObjectURL(blob);
 
-    const a=document.createElement('a');
-    a.href=url;
-    a.download='DVD_export.csv';
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-    URL.revokeObjectURL(url);
+    // Ouvre dans un nouvel onglet.
+    // Sur iPhone : bouton Partager → Enregistrer dans Fichiers → choisis ton dossier.
+    window.open(url, "_blank");
 
-    toast('CSV exporté');
+    toast('CSV prêt. Partager → Enregistrer dans Fichiers');
   });
 
-  /* ===== AJOUTER / EFFACER ===== */
+  /* ===== AJOUTER / TOUT EFFACER ===== */
   byId('btnAdd').addEventListener('click', ()=>{
     if(locked){ toast('Déverrouille pour ajouter'); return; }
     const max=rows.reduce((m,r)=>Math.max(m,parseInt(r.numero||0,10)||0),0);
@@ -1012,7 +1017,6 @@ document.addEventListener('DOMContentLoaded', ()=>{
     themesBody.innerHTML='';
     guerreBody.innerHTML='';
 
-    // colonnes booléennes
     const boolCols=Columns.filter(c=>c.type==='bool').map(c=>c.key);
     const counts={};
     boolCols.forEach(k=>{
@@ -1051,7 +1055,6 @@ document.addEventListener('DOMContentLoaded', ()=>{
       themesBody.appendChild(line);
     });
 
-    // stats Guerre
     const g={WW1:0,WW2:0,Autres:0,'(vide)':0};
     rows.forEach(r=>{
       const v=(r.guerre||'').trim();
@@ -1113,17 +1116,16 @@ document.addEventListener('DOMContentLoaded', ()=>{
     return null;
   }
 
+  // version renforcée : retire accents, unifie tirets, nettoie
   function norm(s){
-    return String(s||'').trim().toLowerCase()
-      .replace(/[áàâä]/g,'a')
-      .replace(/[éèêë]/g,'e')
-      .replace(/[îïìí]/g,'i')
-      .replace(/[ôöòó]/g,'o')
-      .replace(/[ûüùú]/g,'u')
-      .replace(/ç/g,'c')
-      .replace(/[º°]/g,'o')
-      .replace(/\./g,'')
-      .replace(/\s+/g,' ');
+    return String(s||'')
+      .normalize("NFD")                         // sépare lettres et accents
+      .replace(/[\u0300-\u036f]/g,"")           // enlève les accents (é -> e)
+      .replace(/[\u2010-\u2015\u2212\u00ad\-]/g,"-") // tous types de tirets → "-"
+      .replace(/[^\w\- ]+/g," ")                // autres symboles → espace
+      .toLowerCase()
+      .replace(/\s+/g," ")
+      .trim();
   }
 
   function detectDelimiter(sample){
