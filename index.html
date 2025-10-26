@@ -4,7 +4,7 @@
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
 <title>DVD</title>
-<meta name="theme-color" content="#22c55e">
+<meta name="theme-color" content="#22c55e" />
 <style>
 :root{
   --bg:#fdf8e5;
@@ -15,6 +15,7 @@
   --shadow:0 4px 16px rgba(0,0,0,.1);
   --sticky-bg:#fffce6;
 }
+
 html,body{
   margin:0;
   height:100%;
@@ -48,12 +49,6 @@ h1{
   flex-wrap:wrap;
   gap:.5rem;
 }
-.header-meta{
-  font-size:12px;
-  color:#6b5a1d;
-  font-weight:500;
-  margin-top:2px;
-}
 #filmCount{
   display:inline-flex;
   align-items:center;
@@ -68,8 +63,14 @@ h1{
   line-height:1;
   box-shadow:0 1px 3px rgba(0,0,0,.15);
 }
+.header-meta{
+  font-size:12px;
+  color:#6b5a1d;
+  font-weight:500;
+  margin-top:2px;
+}
 
-/* toolbar buttons row */
+/* toolbar */
 .toolbar{
   display:flex;
   flex-wrap:wrap;
@@ -122,7 +123,9 @@ h1{
   cursor:not-allowed;
   filter:grayscale(1);
 }
-input[type="file"]{display:none}
+input[type="file"]{
+  display:none;
+}
 
 /* filtres WW1/WW2/etc */
 .filters{
@@ -183,7 +186,9 @@ thead th{
   line-height:1.2;
   white-space:nowrap;
 }
-thead th.sortable{cursor:pointer;}
+thead th.sortable{
+  cursor:pointer;
+}
 thead th .sortmark{
   color:#6b5a1d;
   font-size:12px;
@@ -218,14 +223,13 @@ td.sticky-num{
 th.sticky-title,
 td.sticky-title{
   position:sticky;
-  left:50px; /* = largeur réelle de Nº sur mobile */
+  left:50px;
   background:var(--sticky-bg);
   border-right:1px solid var(--border);
   z-index:14;
   min-width:140px;
   max-width:200px;
   width:170px;
-  /* autoriser retour à la ligne */
   white-space:normal;
   word-break:break-word;
   overflow-wrap:break-word;
@@ -256,17 +260,6 @@ td.sticky-title{
 }
 .icon-btn[disabled]:hover{
   background:linear-gradient(180deg,rgba(34,197,94,.2),rgba(22,163,74,.12));
-}
-
-/* checkboxes */
-.boolean input[type="checkbox"]{
-  width:18px;
-  height:18px;
-  accent-color:var(--accent);
-}
-.boolean input[type="checkbox"][disabled]{
-  accent-color:#bbb !important;
-  filter:grayscale(1);
 }
 
 /* pastilles guerre */
@@ -376,17 +369,19 @@ td.sticky-title{
   font-size:14px;
   line-height:1.3;
 }
-#toast.show{opacity:1;}
+#toast.show{
+  opacity:1;
+}
 
 @keyframes fadeIn{
   from{opacity:0;transform:translateY(5px);}
   to{opacity:1;transform:translateY(0);}
 }
 
-/* iPhone affinement */
+/* iPhone */
 @media(max-width:480px){
   body{font-size:14px;}
-  table{min-width:900px;} /* un peu moins large */
+  table{min-width:900px;}
   th.sticky-num,
   td.sticky-num{
     min-width:44px;
@@ -395,7 +390,7 @@ td.sticky-title{
   }
   th.sticky-title,
   td.sticky-title{
-    left:44px; /* aligne après Nº */
+    left:44px;
     min-width:130px;
     max-width:150px;
     width:140px;
@@ -421,13 +416,14 @@ td.sticky-title{
       <span id="filmCount">0</span>
     </h1>
     <div class="header-meta">
-      © Pierre Charlier 2025 • v<span id="versionTop"></span>a
+      © Pierre Charlier 2025 • v2.2.6c
     </div>
 
     <div class="toolbar">
       <label class="btn" for="fileInput">📂 Importer CSV</label>
       <input id="fileInput" type="file" accept=".csv,text/csv" />
 
+      <button class="btn secondary" id="btnExport" type="button">⬇️ Exporter CSV</button>
       <button class="btn secondary" id="btnAdd" type="button">➕ Ajouter</button>
       <button class="btn danger" id="btnClearAll" type="button">🗑️ Tout effacer</button>
 
@@ -475,7 +471,7 @@ td.sticky-title{
 
 <script>
 document.addEventListener('DOMContentLoaded', ()=>{
-  const APP_VERSION='2.2.6';
+  const APP_VERSION='2.2.6c';
   const STORAGE_KEY='dvd_collection_v2';
   const LOCK_KEY='dvd_locked';
 
@@ -485,8 +481,7 @@ document.addEventListener('DOMContentLoaded', ()=>{
   const btnLock=byId('btnLock');
   const filmCount=byId('filmCount');
 
-  byId('versionTop').textContent=APP_VERSION;
-
+  // Définition des colonnes
   const Columns=[
    {key:'numero',label:'Nº',type:'number',sticky:'num',sortable:true},
    {key:'titre',label:'Titre',type:'text',sticky:'title',sortable:true},
@@ -494,7 +489,7 @@ document.addEventListener('DOMContentLoaded', ()=>{
    {key:'aviation',label:'Aviation',type:'bool',sortable:true},
    {key:'animation',label:'Animation',type:'bool',sortable:true},
    {key:'aventure',label:'Aventure',type:'bool',sortable:true},
-   {key:'sf',label:'S. fiction',type:'bool',sortable:true},
+   {key:'sf',label:'S.Fiction',type:'bool',sortable:true},
    {key:'explor',label:'Exploration',type:'bool',sortable:true},
    {key:'guerre',label:'Guerre',type:'choice',sortable:true,options:['','WW1','WW2','Autres']},
    {key:'animaux',label:'Animaux',type:'bool',sortable:true},
@@ -508,6 +503,7 @@ document.addEventListener('DOMContentLoaded', ()=>{
    {key:'_actions',label:'',type:'actions',sortable:false}
   ];
 
+  // Données
   let rows = loadLocal();
   if(!rows || !Array.isArray(rows) || !rows.length){
     rows=[
@@ -519,22 +515,23 @@ document.addEventListener('DOMContentLoaded', ()=>{
     saveLocal();
   }
 
+  // Tri / filtre / verrou
   let sortState={ key:'numero', dir:'asc' };
   let guerreFilter='ALL';
-
-  // verrou restauré depuis localStorage
   let locked = loadLockedState();
-  updateLockButton(); // met à jour bouton et label
+  updateLockButton();
 
-  /* === BUILD HEADER (avec tri) === */
+  /* ===== Construction de l'en-tête avec tri ===== */
   function buildHeader(){
     thead.innerHTML='';
     const tr=document.createElement('tr');
     Columns.forEach(c=>{
       const th=document.createElement('th');
       th.textContent=c.label;
+
       if(c.sticky==='num'){ th.classList.add('sticky-num'); }
       if(c.sticky==='title'){ th.classList.add('sticky-title'); }
+
       if(c.sortable){
         th.classList.add('sortable');
         const mark=document.createElement('span');
@@ -552,11 +549,13 @@ document.addEventListener('DOMContentLoaded', ()=>{
           render();
         });
       }
+
       tr.appendChild(th);
     });
     thead.appendChild(tr);
   }
 
+  /* ===== Comparateur tri ===== */
   function cmp(a,b,c){
     let va=a[c.key], vb=b[c.key];
     if(c.key==='guerre'){
@@ -578,7 +577,7 @@ document.addEventListener('DOMContentLoaded', ()=>{
     return 0;
   }
 
-  /* === VERROU === */
+  /* ===== Lock ===== */
   function updateLockButton(){
     if(locked){
       btnLock.classList.remove('unlocked');
@@ -613,7 +612,18 @@ document.addEventListener('DOMContentLoaded', ()=>{
     return false;
   }
 
-  /* === RENDER TABLE === */
+  /* ===== Filtre Guerre ===== */
+  function initFilters(){
+    document.querySelectorAll('#guerreFilters .chipbtn').forEach(b=>{
+      b.addEventListener('click', ()=>{
+        document.querySelectorAll('#guerreFilters .chipbtn').forEach(x=>x.classList.remove('active'));
+        b.classList.add('active');
+        guerreFilter = b.dataset.v;
+        render();
+      });
+    });
+  }
+
   function applyFilterIndexed(arrWithIdx){
     if(guerreFilter==='ALL') return arrWithIdx;
     return arrWithIdx.filter(r=>{
@@ -623,6 +633,7 @@ document.addEventListener('DOMContentLoaded', ()=>{
     });
   }
 
+  /* ===== Affichage pastille Guerre ===== */
   function setBadge(el, val){
     el.textContent = val || '—';
     el.className='badge';
@@ -631,25 +642,28 @@ document.addEventListener('DOMContentLoaded', ()=>{
     else if(val==='Autres') el.classList.add('badge-autres');
   }
 
+  /* ===== Rendu du tableau ===== */
   function render(){
-    // vue indexée
-    const withIdx = rows.map((r,i)=>({ ...r, _idx:i }));
+    // Indexer les lignes (pour garder l'index réel même après tri/filtre)
+    const indexed = rows.map((r,i)=>({ ...r, _idx:i }));
+
     // filtre guerre
-    const filtered = applyFilterIndexed(withIdx);
+    const filtered = applyFilterIndexed(indexed);
 
     // tri
-    const col = Columns.find(c=>c.key===sortState.key) || Columns[0];
-    filtered.sort((x,y)=> (cmp(x,y,col)) * (sortState.dir==='asc'?1:-1));
+    const sortCol = Columns.find(c=>c.key===sortState.key) || Columns[0];
+    filtered.sort((a,b)=> (cmp(a,b,sortCol)) * (sortState.dir==='asc'?1:-1));
 
-    // rendu tbody
+    // vider tbody
     tbody.innerHTML='';
+
+    // remplir
     filtered.forEach(r=>{
       const tr=document.createElement('tr');
 
       Columns.forEach(c=>{
         const td=document.createElement('td');
 
-        // sticky classes
         if(c.sticky==='num'){ td.classList.add('sticky-num'); }
         if(c.sticky==='title'){ td.classList.add('sticky-title'); }
 
@@ -658,6 +672,7 @@ document.addEventListener('DOMContentLoaded', ()=>{
 
           const editBtn=iconBtn('✏️','Éditer',()=>enterRowEdit(tr, rows[r._idx], r._idx));
           const delBtn =iconBtn('🗑️','Supprimer',()=>{
+            if(locked){toast('Déverrouille pour supprimer');return;}
             rows.splice(r._idx,1);
             saveLocal();
             render();
@@ -689,9 +704,7 @@ document.addEventListener('DOMContentLoaded', ()=>{
         } else if(c.key==='guerre'){
           const sel=document.createElement('select');
           (c.options||['']).forEach(v=>{
-            const o=document.createElement('option');
-            o.value=v;o.text=v;
-            sel.appendChild(o);
+            const o=document.createElement('option');o.value=v;o.text=v;sel.appendChild(o);
           });
           sel.value=r.guerre||'';
 
@@ -741,10 +754,11 @@ document.addEventListener('DOMContentLoaded', ()=>{
       tbody.appendChild(tr);
     });
 
-    // compteurs bas + rond en haut
+    // compteurs
     byId('countShown').textContent=filtered.length;
     byId('countTotal').textContent=rows.length;
     filmCount.textContent=rows.length;
+
     // état des boutons globaux
     byId('btnAdd').disabled = locked;
     byId('btnClearAll').disabled = locked;
@@ -760,9 +774,9 @@ document.addEventListener('DOMContentLoaded', ()=>{
     return b;
   }
 
-  /* === EDIT MODE INLINE === */
+  /* ===== ÉDITION LIGNE COMPLÈTE ===== */
   function enterRowEdit(tr,row,realIndex){
-    if(locked) return;
+    if(locked){toast('Déverrouille pour éditer');return;}
     const cells=tr.querySelectorAll('td');
     Columns.forEach((c,i)=>{
       const td=cells[i];
@@ -826,7 +840,7 @@ document.addEventListener('DOMContentLoaded', ()=>{
     });
   }
 
-  /* === IMPORT CSV === */
+  /* ===== IMPORT CSV ===== */
   byId('fileInput').addEventListener('change', e=>{
     const f=e.target.files?.[0];
     if(!f) return;
@@ -838,7 +852,7 @@ document.addEventListener('DOMContentLoaded', ()=>{
       const header=grid[0];
       const body=grid.slice(1);
 
-      // mapping souple
+      // mapping intelligent: on associe les colonnes CSV aux clés internes
       const map={};
       header.forEach((h,i)=>{
         const n=norm(h);
@@ -889,9 +903,14 @@ document.addEventListener('DOMContentLoaded', ()=>{
           return o;
         });
 
-      // auto-numérotation si Nº manquant
+      // si pas de numéro, on recalcule
       let max=rows.reduce((m,r)=>Math.max(m,parseInt(r.numero||0,10)||0),0);
-      rows.forEach(r=>{ if(!r.numero){ max+=1; r.numero=String(max); } });
+      rows.forEach(r=>{
+        if(!r.numero){
+          max+=1;
+          r.numero=String(max);
+        }
+      });
 
       saveLocal();
       render();
@@ -900,7 +919,59 @@ document.addEventListener('DOMContentLoaded', ()=>{
     });
   });
 
-  /* === AJOUTER / TOUT EFFACER === */
+  /* ===== EXPORT CSV ===== */
+  byId('btnExport').addEventListener('click',()=>{
+    if(!rows.length){
+      toast('Aucune donnée à exporter');
+      return;
+    }
+
+    const header = [
+      "Nº","Titre","Voyage","Aviation","Animation","Aventure","S.Fiction",
+      "Exploration","Guerre","Animaux","Disney","Horreur",
+      "Enfants","Famille","Histoire","Autres","Nom-clé"
+    ];
+
+    const lines=[header.join(';')];
+
+    rows.forEach(r=>{
+      const vals=[
+        r.numero || "",
+        r.titre || "",
+        r.voyage ? "Oui" : "Non",
+        r.aviation ? "Oui" : "Non",
+        r.animation ? "Oui" : "Non",
+        r.aventure ? "Oui" : "Non",
+        r.sf ? "Oui" : "Non",
+        r.explor ? "Oui" : "Non",
+        r.guerre || "",
+        r.animaux ? "Oui" : "Non",
+        r.disney ? "Oui" : "Non",
+        r.horreur ? "Oui" : "Non",
+        r.enfants ? "Oui" : "Non",
+        r.famille ? "Oui" : "Non",
+        r.histoire ? "Oui" : "Non",
+        r.autres ? "Oui" : "Non",
+        r.nomcle || ""
+      ].map(v => `"${String(v).replace(/"/g,'""')}"`);
+      lines.push(vals.join(';'));
+    });
+
+    const blob=new Blob([lines.join('\n')],{type:'text/csv;charset=utf-8;'});
+    const url=URL.createObjectURL(blob);
+
+    const a=document.createElement('a');
+    a.href=url;
+    a.download='DVD_export.csv';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+
+    toast('CSV exporté');
+  });
+
+  /* ===== AJOUTER / EFFACER ===== */
   byId('btnAdd').addEventListener('click', ()=>{
     if(locked){ toast('Déverrouille pour ajouter'); return; }
     const max=rows.reduce((m,r)=>Math.max(m,parseInt(r.numero||0,10)||0),0);
@@ -927,8 +998,9 @@ document.addEventListener('DOMContentLoaded', ()=>{
     }
   });
 
-  /* === STATISTIQUES === */
-  byId('btnStats').addEventListener('click', ()=>{
+  /* ===== STATS ===== */
+  const btnStats = byId('btnStats');
+  btnStats.addEventListener('click', ()=>{
     statsEl.classList.toggle('open');
     if(statsEl.classList.contains('open')) renderStats();
   });
@@ -951,18 +1023,26 @@ document.addEventListener('DOMContentLoaded', ()=>{
     const max=Math.max(1,...Object.values(counts),total);
 
     boolCols.forEach(key=>{
-      const label=Columns.find(c=>c.key===key).label;
+      const colInfo=Columns.find(c=>c.key===key);
+      const label=colInfo?colInfo.label:key;
       const val=counts[key]||0;
 
-      const line=document.createElement('div'); line.className='metric';
-      const l=document.createElement('div'); l.className='label'; l.textContent=label;
+      const line=document.createElement('div');
+      line.className='metric';
 
-      const bar=document.createElement('div'); bar.className='bar';
+      const l=document.createElement('div');
+      l.className='label';
+      l.textContent=label;
+
+      const bar=document.createElement('div');
+      bar.className='bar';
+
       const fill=document.createElement('i');
       fill.style.width=(Math.max(0,Math.min(100,(val/max*100)))).toFixed(1)+'%';
       bar.appendChild(fill);
 
-      const v=document.createElement('div'); v.className='val';
+      const v=document.createElement('div');
+      v.className='val';
       v.textContent = `${val} / ${total}`;
 
       line.appendChild(l);
@@ -971,6 +1051,7 @@ document.addEventListener('DOMContentLoaded', ()=>{
       themesBody.appendChild(line);
     });
 
+    // stats Guerre
     const g={WW1:0,WW2:0,Autres:0,'(vide)':0};
     rows.forEach(r=>{
       const v=(r.guerre||'').trim();
@@ -981,17 +1062,22 @@ document.addEventListener('DOMContentLoaded', ()=>{
     });
 
     ['WW1','WW2','Autres','(vide)'].forEach(k=>{
-      const line=document.createElement('div'); line.className='metric';
+      const line=document.createElement('div');
+      line.className='metric';
 
-      const l=document.createElement('div'); l.className='label';
+      const l=document.createElement('div');
+      l.className='label';
       l.textContent='Guerre '+k;
 
-      const bar=document.createElement('div'); bar.className='bar';
+      const bar=document.createElement('div');
+      bar.className='bar';
+
       const fill=document.createElement('i');
       fill.style.width=(g[k]/total*100).toFixed(1)+'%';
       bar.appendChild(fill);
 
-      const v=document.createElement('div'); v.className='val';
+      const v=document.createElement('div');
+      v.className='val';
       v.textContent=`${g[k]} / ${total}`;
 
       line.appendChild(l);
@@ -1001,7 +1087,7 @@ document.addEventListener('DOMContentLoaded', ()=>{
     });
   }
 
-  /* === UTILS === */
+  /* ===== UTILS ===== */
   function byId(id){ return document.getElementById(id); }
 
   function toast(msg){
@@ -1016,6 +1102,7 @@ document.addEventListener('DOMContentLoaded', ()=>{
     try{ localStorage.setItem(STORAGE_KEY, JSON.stringify(rows)); }
     catch(e){ console.warn(e); }
   }
+
   function loadLocal(){
     try{
       const s=localStorage.getItem(STORAGE_KEY);
@@ -1039,7 +1126,6 @@ document.addEventListener('DOMContentLoaded', ()=>{
       .replace(/\s+/g,' ');
   }
 
-  // détecter ; , tab | automatiquement
   function detectDelimiter(sample){
     const line=(sample.split(/\r?\n/)[0]||sample);
     const candidates=[';',',','\t','|'];
@@ -1051,9 +1137,11 @@ document.addEventListener('DOMContentLoaded', ()=>{
     return best;
   }
 
-  // parse CSV support guillemets ""
   function parseCSV(text,delim){
-    const out=[]; let row=[]; let cur=''; let inQ=false;
+    const out=[];
+    let row=[];
+    let cur='';
+    let inQ=false;
     for(let i=0;i<text.length;i++){
       const c=text[i];
       if(inQ){
@@ -1067,7 +1155,7 @@ document.addEventListener('DOMContentLoaded', ()=>{
         if(c=='"'){ inQ=true; }
         else if(c===delim){ row.push(cur); cur=''; }
         else if(c=='\n'){ row.push(cur); out.push(row); row=[]; cur=''; }
-        else if(c=='\r'){ /* skip */ }
+        else if(c=='\r'){ /* ignore */ }
         else { cur+=c; }
       }
     }
@@ -1076,17 +1164,7 @@ document.addEventListener('DOMContentLoaded', ()=>{
     return out;
   }
 
-  function initFilters(){
-    document.querySelectorAll('#guerreFilters .chipbtn').forEach(b=>{
-      b.addEventListener('click', ()=>{
-        document.querySelectorAll('#guerreFilters .chipbtn').forEach(x=>x.classList.remove('active'));
-        b.classList.add('active');
-        guerreFilter = b.dataset.v;
-        render();
-      });
-    });
-  }
-
+  /* ===== LANCEMENT ===== */
   buildHeader();
   initFilters();
   render();
