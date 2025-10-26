@@ -416,7 +416,7 @@ td.sticky-title{
       <span id="filmCount">0</span>
     </h1>
     <div class="header-meta">
-      © Pierre Charlier 2025 • v3.3
+      © Pierre Charlier 2025 • v3.4
     </div>
 
     <div class="toolbar">
@@ -424,6 +424,8 @@ td.sticky-title{
       <input id="fileInput" type="file" accept=".csv,text/csv" />
 
       <button class="btn secondary" id="btnExport" type="button">⬇️ Sauvegarder CSV</button>
+      <button class="btn secondary" id="btnExport2" type="button">💾 Sauvegarde manuelle</button>
+
       <button class="btn secondary" id="btnAdd" type="button">➕ Ajouter</button>
       <button class="btn danger" id="btnClearAll" type="button">🗑️ Tout effacer</button>
 
@@ -471,7 +473,7 @@ td.sticky-title{
 
 <script>
 document.addEventListener('DOMContentLoaded', ()=>{
-  const APP_VERSION='3.3';
+  const APP_VERSION='3.4';
   const STORAGE_KEY='dvd_collection_v2';
   const LOCK_KEY='dvd_locked';
 
@@ -481,8 +483,8 @@ document.addEventListener('DOMContentLoaded', ()=>{
   const btnLock=byId('btnLock');
   const filmCount=byId('filmCount');
 
-  // ATTENTION : libellés modifiés,
-  // nouvelles colonnes ajoutées à la fin
+  // Colonnes actuelles
+  // (Napoleon, Gabin, Tati, Religions, etc.)
   const Columns=[
    {key:'numero',label:'Nº',type:'number',sticky:'num',sortable:true},
    {key:'titre',label:'Titre',type:'text',sticky:'title',sortable:true},
@@ -509,9 +511,11 @@ document.addEventListener('DOMContentLoaded', ()=>{
    {key:'_actions',label:'',type:'actions',sortable:false}
   ];
 
-  // charge la sauvegarde locale
+  /* ===== CHARGEMENT INITIAL AVEC PERSISTENCE ===== */
   let rows = loadLocal();
+
   if(!rows || !Array.isArray(rows) || !rows.length){
+    // Première utilisation : on crée un jeu d'exemple
     rows=[
       {
         numero:'1',  titre:'Le Voyage de Chihiro',
@@ -550,19 +554,33 @@ document.addEventListener('DOMContentLoaded', ()=>{
         nomcle:'Kubrick'
       }
     ];
-    saveLocal(); // on stocke
+    saveLocal();
   } else {
-    // anciens rows -> ajouter les nouvelles colonnes si absentes
+    // Mise à jour de compatibilité :
+    // on ajoute seulement les nouvelles colonnes manquantes
+    // sans JAMAIS écraser ce qui existe déjà
     rows.forEach(r=>{
-      if(r.fernandel===undefined)      r.fernandel=false;
-      if(r.defunes===undefined)        r.defunes=false;
-      if(r.costagavras===undefined)    r.costagavras=false;
-      if(r.chaplin===undefined)        r.chaplin=false;
-      if(r.documentaire===undefined)   r.documentaire=false;
-      if(r.animation===undefined)      r.animation=false;   // Napoleon
-      if(r.sf===undefined)             r.sf=false;          // Gabin
-      if(r.horreur===undefined)        r.horreur=false;      // Tati
-      if(r.famille===undefined)        r.famille=false;      // Religions
+      if(!('fernandel'     in r)) r.fernandel=false;
+      if(!('defunes'       in r)) r.defunes=false;
+      if(!('costagavras'   in r)) r.costagavras=false;
+      if(!('chaplin'       in r)) r.chaplin=false;
+      if(!('documentaire'  in r)) r.documentaire=false;
+      if(!('animation'     in r)) r.animation=false;   // Napoleon
+      if(!('sf'            in r)) r.sf=false;          // Gabin
+      if(!('horreur'       in r)) r.horreur=false;     // Tati
+      if(!('famille'       in r)) r.famille=false;     // Religions
+      if(!('explor'        in r)) r.explor=false;
+      if(!('autres'        in r)) r.autres=false;
+      if(!('voyage'        in r)) r.voyage=false;
+      if(!('aviation'      in r)) r.aviation=false;
+      if(!('aventure'      in r)) r.aventure=false;
+      if(!('animaux'       in r)) r.animaux=false;
+      if(!('disney'        in r)) r.disney=false;
+      if(!('enfants'       in r)) r.enfants=false;
+      if(!('famille'       in r)) r.famille=false;
+      if(!('histoire'      in r)) r.histoire=false;
+      if(!('guerre'        in r)) r.guerre='';
+      if(!('nomcle'        in r)) r.nomcle='';
     });
     saveLocal();
   }
@@ -960,7 +978,7 @@ document.addEventListener('DOMContentLoaded', ()=>{
         }
       });
 
-      // Si pas de nomcle détecté, force la dernière colonne en nomcle
+      // si pas de nomcle détecté -> dernière colonne
       if(!Object.values(map).includes('nomcle')){
         const lastColIndex = header.length - 1;
         if(!map[lastColIndex]){
@@ -968,12 +986,15 @@ document.addEventListener('DOMContentLoaded', ()=>{
         }
       }
 
+      // Construire les nouvelles lignes depuis le CSV
       rows = body
         .filter(r=>r.some(c=>String(c).trim()!==''))
         .map(r=>{
           const o={};
           Columns.forEach(c=>{
-            if(c.key!=='_actions') o[c.key]=(c.type==='bool'?false:'');
+            if(c.key!=='_actions'){
+              o[c.key]=(c.type==='bool'?false:'');
+            }
           });
           r.forEach((cell,i)=>{
             const key=map[i];
@@ -994,17 +1015,17 @@ document.addEventListener('DOMContentLoaded', ()=>{
             }
           });
 
-          // ajoute colonnes manquantes si pas dans CSV
-          if(o.fernandel===undefined)    o.fernandel=false;
-          if(o.defunes===undefined)      o.defunes=false;
-          if(o.costagavras===undefined)  o.costagavras=false;
-          if(o.chaplin===undefined)      o.chaplin=false;
-          if(o.documentaire===undefined) o.documentaire=false;
+          // colonnes manquantes -> false par défaut
+          if(!('fernandel'     in o)) o.fernandel=false;
+          if(!('defunes'       in o)) o.defunes=false;
+          if(!('costagavras'   in o)) o.costagavras=false;
+          if(!('chaplin'       in o)) o.chaplin=false;
+          if(!('documentaire'  in o)) o.documentaire=false;
 
           return o;
         });
 
-      // auto-numérotation si manque
+      // donner un numéro si champ Nº vide
       let max=rows.reduce((m,r)=>Math.max(m,parseInt(r.numero||0,10)||0),0);
       rows.forEach(r=>{
         if(!r.numero){
@@ -1013,15 +1034,15 @@ document.addEventListener('DOMContentLoaded', ()=>{
         }
       });
 
-      saveLocal();
+      saveLocal(); // on écrase l'ancienne sauvegarde par le CSV importé
       render();
       if(statsOpen()) renderStats();
       toast('CSV importé');
     });
   });
 
-  /* ===== EXPORT CSV ===== */
-  byId('btnExport').addEventListener('click', ()=>{
+  /* ===== EXPORT CSV (bouton principal et sauvegarde manuelle) ===== */
+  function exportCSV(){
     if(!rows.length){
       toast('Aucune donnée à exporter');
       return;
@@ -1077,7 +1098,10 @@ document.addEventListener('DOMContentLoaded', ()=>{
     URL.revokeObjectURL(url);
 
     toast('CSV exporté');
-  });
+  }
+
+  byId('btnExport').addEventListener('click', exportCSV);
+  byId('btnExport2').addEventListener('click', exportCSV);
 
   /* ===== AJOUTER / TOUT EFFACER ===== */
   byId('btnAdd').addEventListener('click', ()=>{
@@ -1130,7 +1154,7 @@ document.addEventListener('DOMContentLoaded', ()=>{
     });
 
     const total=rows.length||1;
-    const max=Math.max(1,...Object.values(counts),total);
+    const maxVal=Math.max(1,...Object.values(counts),total);
 
     boolCols.forEach(key=>{
       const colInfo=Columns.find(c=>c.key===key);
@@ -1148,7 +1172,7 @@ document.addEventListener('DOMContentLoaded', ()=>{
       bar.className='bar';
 
       const fill=document.createElement('i');
-      fill.style.width=(Math.max(0,Math.min(100,(val/max*100)))).toFixed(1)+'%';
+      fill.style.width=(Math.max(0,Math.min(100,(val/maxVal*100)))).toFixed(1)+'%';
       bar.appendChild(fill);
 
       const v=document.createElement('div');
@@ -1233,7 +1257,7 @@ document.addEventListener('DOMContentLoaded', ()=>{
     return best;
   }
 
-  // parse CSV avec dernière cellule
+  // parse CSV qui garde la dernière cellule même sans ; final
   function parseCSV(text, delim) {
     const out = [];
     let row = [];
