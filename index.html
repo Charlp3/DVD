@@ -34,7 +34,7 @@ header{
   z-index:20;
 }
 .wrap{
-  max-width:1200px;
+  max-width:1400px;
   margin:0 auto;
   padding:12px 16px;
 }
@@ -89,7 +89,7 @@ h1{
   border-radius:8px;
   cursor:pointer;
   transition:.2s transform,.2s background;
-  box-shadow:var(--shadow);
+  box-shadow:0 4px 16px rgba(0,0,0,.1);
   font-size:14px;
   line-height:1.2;
 }
@@ -156,10 +156,10 @@ input[type="file"]{
 /* PANEL / TABLE */
 .panel{
   margin:12px auto;
-  background:var(--panel);
+  background:#fffdf5;
   border:1px solid var(--border);
   border-radius:10px;
-  box-shadow:var(--shadow);
+  box-shadow:0 4px 16px rgba(0,0,0,.1);
 }
 .table-wrap{
   overflow:auto;
@@ -169,7 +169,7 @@ table{
   border-collapse:separate;
   border-spacing:0;
   width:100%;
-  min-width:1000px;
+  min-width:1300px;
 }
 thead th{
   position:sticky;
@@ -211,7 +211,7 @@ th.sticky-num,
 td.sticky-num{
   position:sticky;
   left:0;
-  background:var(--sticky-bg);
+  background:#fffce6;
   border-right:1px solid var(--border);
   z-index:15;
   min-width:50px;
@@ -224,7 +224,7 @@ th.sticky-title,
 td.sticky-title{
   position:sticky;
   left:50px;
-  background:var(--sticky-bg);
+  background:#fffce6;
   border-right:1px solid var(--border);
   z-index:14;
   min-width:140px;
@@ -293,7 +293,7 @@ td.sticky-title{
   grid-template-columns:1fr 1fr;
   gap:16px;
   margin:10px auto;
-  max-width:1200px;
+  max-width:1400px;
   padding:0 16px 16px;
 }
 .stats.open{
@@ -304,7 +304,7 @@ td.sticky-title{
   background:#fffef6;
   border:1px solid var(--border);
   border-radius:10px;
-  box-shadow:var(--shadow);
+  box-shadow:0 4px 16px rgba(0,0,0,.1);
 }
 .card h3{
   margin:0;
@@ -328,7 +328,7 @@ td.sticky-title{
 }
 .metric .label{
   min-width:150px;
-  color:#5a4a17;
+  color:#5f4a17;
   font-size:14px;
 }
 .bar{
@@ -381,7 +381,7 @@ td.sticky-title{
 /* iPhone */
 @media(max-width:480px){
   body{font-size:14px;}
-  table{min-width:900px;}
+  table{min-width:1200px;}
   th.sticky-num,
   td.sticky-num{
     min-width:44px;
@@ -416,7 +416,7 @@ td.sticky-title{
       <span id="filmCount">0</span>
     </h1>
     <div class="header-meta">
-      © Pierre Charlier 2025 • v3.0
+      © Pierre Charlier 2025 • v3.3
     </div>
 
     <div class="toolbar">
@@ -471,7 +471,7 @@ td.sticky-title{
 
 <script>
 document.addEventListener('DOMContentLoaded', ()=>{
-  const APP_VERSION='3.0';
+  const APP_VERSION='3.3';
   const STORAGE_KEY='dvd_collection_v2';
   const LOCK_KEY='dvd_locked';
 
@@ -481,47 +481,99 @@ document.addEventListener('DOMContentLoaded', ()=>{
   const btnLock=byId('btnLock');
   const filmCount=byId('filmCount');
 
-  // Colonnes, avec Nomcle sans tiret ni accent
+  // ATTENTION : libellés modifiés,
+  // nouvelles colonnes ajoutées à la fin
   const Columns=[
    {key:'numero',label:'Nº',type:'number',sticky:'num',sortable:true},
    {key:'titre',label:'Titre',type:'text',sticky:'title',sortable:true},
    {key:'voyage',label:'Voyage',type:'bool',sortable:true},
    {key:'aviation',label:'Aviation',type:'bool',sortable:true},
-   {key:'animation',label:'Animation',type:'bool',sortable:true},
+   {key:'animation',label:'Napoleon',type:'bool',sortable:true},        // ex-Animation
    {key:'aventure',label:'Aventure',type:'bool',sortable:true},
-   {key:'sf',label:'S.Fiction',type:'bool',sortable:true},
+   {key:'sf',label:'Gabin',type:'bool',sortable:true},                   // ex-S.Fiction
    {key:'explor',label:'Exploration',type:'bool',sortable:true},
    {key:'guerre',label:'Guerre',type:'choice',sortable:true,options:['','WW1','WW2','Autres']},
    {key:'animaux',label:'Animaux',type:'bool',sortable:true},
    {key:'disney',label:'Disney',type:'bool',sortable:true},
-   {key:'horreur',label:'Horreur',type:'bool',sortable:true},
+   {key:'horreur',label:'Tati',type:'bool',sortable:true},               // ex-Horreur
    {key:'enfants',label:'Enfants',type:'bool',sortable:true},
-   {key:'famille',label:'Famille',type:'bool',sortable:true},
+   {key:'famille',label:'Religions',type:'bool',sortable:true},          // ex-Famille
    {key:'histoire',label:'Histoire',type:'bool',sortable:true},
    {key:'autres',label:'Autres',type:'bool',sortable:true},
+   {key:'fernandel',label:'Fernandel',type:'bool',sortable:true},
+   {key:'defunes',label:'de Funes',type:'bool',sortable:true},
+   {key:'costagavras',label:'Costa Gavras',type:'bool',sortable:true},
+   {key:'chaplin',label:'Chaplin',type:'bool',sortable:true},
+   {key:'documentaire',label:'Documentaire',type:'bool',sortable:true},
    {key:'nomcle',label:'Nomcle',type:'text',sortable:true},
    {key:'_actions',label:'',type:'actions',sortable:false}
   ];
 
-  // Chargement local
+  // charge la sauvegarde locale
   let rows = loadLocal();
   if(!rows || !Array.isArray(rows) || !rows.length){
     rows=[
-      { numero:'1',  titre:'Le Voyage de Chihiro', voyage:true, aviation:false, animation:true,  aventure:true,  sf:false, explor:false, guerre:'',    animaux:true,  disney:false, horreur:false, enfants:true,  famille:true,  histoire:false, autres:false, nomcle:'Miyazaki' },
-      { numero:'2',  titre:'Dunkerque',            voyage:false,aviation:true,  animation:false, aventure:false, sf:false, explor:false, guerre:'WW2', animaux:false, disney:false, horreur:false, enfants:false, famille:false, histoire:true,  autres:false, nomcle:'Christopher Nolan' },
-      { numero:'42', titre:'Interstellar',         voyage:false,aviation:false, animation:false, aventure:true,  sf:true,  explor:true,  guerre:'',    animaux:false, disney:false, horreur:false, enfants:false, famille:false, histoire:false,autres:false, nomcle:'Matthew McConaughey; Nolan' },
-      { numero:'7',  titre:'Les Sentiers de la gloire', voyage:false,aviation:false, animation:false, aventure:false, sf:false, explor:false, guerre:'WW1', animaux:false, disney:false, horreur:false, enfants:false, famille:false, histoire:true, autres:false, nomcle:'Kubrick' }
+      {
+        numero:'1',  titre:'Le Voyage de Chihiro',
+        voyage:true, aviation:false, animation:true, aventure:true,
+        sf:false, explor:false, guerre:'',
+        animaux:true, disney:false, horreur:false, enfants:true,
+        famille:true, histoire:false, autres:false,
+        fernandel:false, defunes:false, costagavras:false, chaplin:false, documentaire:false,
+        nomcle:'Miyazaki'
+      },
+      {
+        numero:'2',  titre:'Dunkerque',
+        voyage:false,aviation:true,  animation:false, aventure:false,
+        sf:false, explor:false, guerre:'WW2',
+        animaux:false, disney:false, horreur:false, enfants:false,
+        famille:false, histoire:true,  autres:false,
+        fernandel:false, defunes:false, costagavras:false, chaplin:false, documentaire:false,
+        nomcle:'Christopher Nolan'
+      },
+      {
+        numero:'42', titre:'Interstellar',
+        voyage:false,aviation:false, animation:false, aventure:true,
+        sf:true,  explor:true,  guerre:'',
+        animaux:false, disney:false, horreur:false, enfants:false,
+        famille:false, histoire:false,autres:false,
+        fernandel:false, defunes:false, costagavras:false, chaplin:false, documentaire:false,
+        nomcle:'Matthew McConaughey; Nolan'
+      },
+      {
+        numero:'7',  titre:'Les Sentiers de la gloire',
+        voyage:false,aviation:false, animation:false, aventure:false,
+        sf:false, explor:false, guerre:'WW1',
+        animaux:false, disney:false, horreur:false, enfants:false,
+        famille:false, histoire:true, autres:false,
+        fernandel:false, defunes:false, costagavras:false, chaplin:false, documentaire:false,
+        nomcle:'Kubrick'
+      }
     ];
+    saveLocal(); // on stocke
+  } else {
+    // anciens rows -> ajouter les nouvelles colonnes si absentes
+    rows.forEach(r=>{
+      if(r.fernandel===undefined)      r.fernandel=false;
+      if(r.defunes===undefined)        r.defunes=false;
+      if(r.costagavras===undefined)    r.costagavras=false;
+      if(r.chaplin===undefined)        r.chaplin=false;
+      if(r.documentaire===undefined)   r.documentaire=false;
+      if(r.animation===undefined)      r.animation=false;   // Napoleon
+      if(r.sf===undefined)             r.sf=false;          // Gabin
+      if(r.horreur===undefined)        r.horreur=false;      // Tati
+      if(r.famille===undefined)        r.famille=false;      // Religions
+    });
     saveLocal();
   }
 
-  // Tri / filtre / verrou
+  // tri / filtre / verrou
   let sortState={ key:'numero', dir:'asc' };
   let guerreFilter='ALL';
   let locked = loadLockedState();
   updateLockButton();
 
-  /* ===== HEADER avec tri ===== */
+  /* ===== HEADER + tri ===== */
   function buildHeader(){
     thead.innerHTML='';
     const tr=document.createElement('tr');
@@ -576,7 +628,7 @@ document.addEventListener('DOMContentLoaded', ()=>{
     return 0;
   }
 
-  /* ===== Lock ===== */
+  /* ===== verrou édition ===== */
   function updateLockButton(){
     if(locked){
       btnLock.classList.remove('unlocked');
@@ -590,7 +642,6 @@ document.addEventListener('DOMContentLoaded', ()=>{
       byId('lockStateLabel').textContent='Édition ON';
     }
   }
-
   btnLock.addEventListener('click',()=>{
     locked=!locked;
     saveLockedState();
@@ -598,7 +649,6 @@ document.addEventListener('DOMContentLoaded', ()=>{
     render();
     toast(locked?'Verrou activé':'Verrou retiré');
   });
-
   function saveLockedState(){
     try{ localStorage.setItem(LOCK_KEY, locked?'1':'0'); }catch(e){}
   }
@@ -611,7 +661,7 @@ document.addEventListener('DOMContentLoaded', ()=>{
     return false;
   }
 
-  /* ===== Filtres WW1/WW2/etc ===== */
+  /* ===== filtres WW1/WW2/etc ===== */
   function initFilters(){
     document.querySelectorAll('#guerreFilters .chipbtn').forEach(b=>{
       b.addEventListener('click', ()=>{
@@ -622,7 +672,6 @@ document.addEventListener('DOMContentLoaded', ()=>{
       });
     });
   }
-
   function applyFilterIndexed(arrWithIdx){
     if(guerreFilter==='ALL') return arrWithIdx;
     return arrWithIdx.filter(r=>{
@@ -640,7 +689,7 @@ document.addEventListener('DOMContentLoaded', ()=>{
     else if(val==='Autres') el.classList.add('badge-autres');
   }
 
-  /* ===== Rendu du tableau ===== */
+  /* ===== rendu tableau ===== */
   function render(){
     const indexed = rows.map((r,i)=>({ ...r, _idx:i }));
     const filtered = applyFilterIndexed(indexed);
@@ -763,7 +812,7 @@ document.addEventListener('DOMContentLoaded', ()=>{
     return b;
   }
 
-  /* ===== ÉDITION LIGNE ===== */
+  /* ===== édition ligne ===== */
   function enterRowEdit(tr,row){
     if(locked){toast('Déverrouille pour éditer');return;}
     const cells=tr.querySelectorAll('td');
@@ -841,31 +890,66 @@ document.addEventListener('DOMContentLoaded', ()=>{
       const header=grid[0];
       const body=grid.slice(1);
 
+      function cleanHeader(h){
+        return String(h||'')
+          .replace(/^\uFEFF/,'')
+          .replace(/^"+|"+$/g,'')
+          .trim()
+          .normalize("NFD")
+          .replace(/[\u0300-\u036f]/g,"")
+          .replace(/[\u2010-\u2015\u2212\u00ad\-]/g,"-")
+          .replace(/[^\w\- ]+/g," ")
+          .toLowerCase()
+          .replace(/\s+/g," ")
+          .trim();
+      }
+
       const map={};
       header.forEach((h,i)=>{
-        const n=norm(h);
+        const n=cleanHeader(h);
+
         if(n.startsWith('n')) map[i]='numero';
         else if(n.includes('titre')||n.includes('title')||n.includes('film')) map[i]='titre';
         else if(n.includes('voyage')) map[i]='voyage';
         else if(n.includes('aviation')) map[i]='aviation';
-        else if(n.includes('animation')||n==='anim') map[i]='animation';
+
+        // Napoleon (ancienne "Animation")
+        else if(n.includes('napoleon')||n.includes('animation')||n==='anim') map[i]='animation';
+
         else if(n.includes('aventure')) map[i]='aventure';
-        else if(n.includes('s fiction')||n==='sf'||n.includes('science')) map[i]='sf';
+
+        // Gabin (ancienne S.Fiction)
+        else if(n.includes('gabin')||n.includes('s fiction')||n==='sf'||n.includes('science')) map[i]='sf';
+
         else if(n.includes('explor')||n.includes('espace')) map[i]='explor';
         else if(n.includes('guerre')||n==='war') map[i]='guerre';
         else if(n.includes('animaux')||n==='animal') map[i]='animaux';
         else if(n.includes('disney')) map[i]='disney';
-        else if(n.includes('horreur')||n==='horror') map[i]='horreur';
+
+        // Tati (ancienne Horreur)
+        else if(n.includes('tati')||n.includes('horreur')||n==='horror') map[i]='horreur';
+
         else if(n.includes('enfant')||n==='kids') map[i]='enfants';
-        else if(n.includes('famille')||n==='family') map[i]='famille';
+
+        // Religions (ancienne Famille)
+        else if(n.includes('religion')||n.includes('famille')||n==='family') map[i]='famille';
+
         else if(n.includes('histo')) map[i]='histoire';
         else if(n.includes('autres')||n==='autre'||n==='other'||n==='misc') map[i]='autres';
+
+        else if(n.includes('fernandel')) map[i]='fernandel';
+        else if(n.includes('funes')) map[i]='defunes';
+        else if(n.includes('costa gavras')||n.includes('gavras')) map[i]='costagavras';
+        else if(n.includes('chaplin')) map[i]='chaplin';
+        else if(n.includes('documentaire')||n.includes('docu')) map[i]='documentaire';
+
         else if(
           n.includes('nomcle') ||
           n.includes('nom cle') ||
           n.includes('nom-cle') ||
           n.includes('nom clé') ||
           n.includes('nom-clé') ||
+          n.includes('nom-clef') ||
           n.includes('keywords') ||
           n.includes('tags') ||
           n.includes('director') ||
@@ -875,6 +959,14 @@ document.addEventListener('DOMContentLoaded', ()=>{
           map[i]='nomcle';
         }
       });
+
+      // Si pas de nomcle détecté, force la dernière colonne en nomcle
+      if(!Object.values(map).includes('nomcle')){
+        const lastColIndex = header.length - 1;
+        if(!map[lastColIndex]){
+          map[lastColIndex]='nomcle';
+        }
+      }
 
       rows = body
         .filter(r=>r.some(c=>String(c).trim()!==''))
@@ -894,17 +986,25 @@ document.addEventListener('DOMContentLoaded', ()=>{
                 (v===''||v==='non'||v==='0'||v==='false' ? '' : 'Autres');
             } else if(Columns.find(c=>c.key===key)?.type==='bool'){
               const v=String(cell).trim().toLowerCase();
-              o[key]=['1','oui','yes','true','vrai','x','✓'].includes(v);
+              o[key]=['1','oui','yes','true','vrai','x','✓','oui '].includes(v);
             } else if(key==='numero'){
               o.numero = String(cell).replace(/[^\d]/g,'');
             } else {
               o[key]=String(cell).trim();
             }
           });
+
+          // ajoute colonnes manquantes si pas dans CSV
+          if(o.fernandel===undefined)    o.fernandel=false;
+          if(o.defunes===undefined)      o.defunes=false;
+          if(o.costagavras===undefined)  o.costagavras=false;
+          if(o.chaplin===undefined)      o.chaplin=false;
+          if(o.documentaire===undefined) o.documentaire=false;
+
           return o;
         });
 
-      // Nº auto si vide
+      // auto-numérotation si manque
       let max=rows.reduce((m,r)=>Math.max(m,parseInt(r.numero||0,10)||0),0);
       rows.forEach(r=>{
         if(!r.numero){
@@ -928,9 +1028,11 @@ document.addEventListener('DOMContentLoaded', ()=>{
     }
 
     const header = [
-      "Nº","Titre","Voyage","Aviation","Animation","Aventure","S.Fiction",
-      "Exploration","Guerre","Animaux","Disney","Horreur",
-      "Enfants","Famille","Histoire","Autres","Nomcle"
+      "Nº","Titre","Voyage","Aviation","Napoleon","Aventure","Gabin",
+      "Exploration","Guerre","Animaux","Disney","Tati",
+      "Enfants","Religions","Histoire","Autres",
+      "Fernandel","de Funes","Costa Gavras","Chaplin","Documentaire",
+      "Nomcle"
     ];
 
     const lines=[header.join(';')];
@@ -941,18 +1043,23 @@ document.addEventListener('DOMContentLoaded', ()=>{
         r.titre || "",
         r.voyage ? "Oui" : "Non",
         r.aviation ? "Oui" : "Non",
-        r.animation ? "Oui" : "Non",
+        r.animation ? "Oui" : "Non",      // Napoleon
         r.aventure ? "Oui" : "Non",
-        r.sf ? "Oui" : "Non",
+        r.sf ? "Oui" : "Non",             // Gabin
         r.explor ? "Oui" : "Non",
         r.guerre || "",
         r.animaux ? "Oui" : "Non",
         r.disney ? "Oui" : "Non",
-        r.horreur ? "Oui" : "Non",
+        r.horreur ? "Oui" : "Non",        // Tati
         r.enfants ? "Oui" : "Non",
-        r.famille ? "Oui" : "Non",
+        r.famille ? "Oui" : "Non",        // Religions
         r.histoire ? "Oui" : "Non",
         r.autres ? "Oui" : "Non",
+        r.fernandel ? "Oui" : "Non",
+        r.defunes ? "Oui" : "Non",
+        r.costagavras ? "Oui" : "Non",
+        r.chaplin ? "Oui" : "Non",
+        r.documentaire ? "Oui" : "Non",
         r.nomcle || ""
       ].map(v => `"${String(v).replace(/"/g,'""')}"`);
       lines.push(vals.join(';'));
@@ -978,8 +1085,11 @@ document.addEventListener('DOMContentLoaded', ()=>{
     const max=rows.reduce((m,r)=>Math.max(m,parseInt(r.numero||0,10)||0),0);
     rows.unshift({
       numero:String(max+1), titre:'',
-      voyage:false, aviation:false, animation:false, aventure:false, sf:false, explor:false,
-      guerre:'', animaux:false, disney:false, horreur:false, enfants:false, famille:false, histoire:false, autres:false,
+      voyage:false, aviation:false, animation:false, aventure:false,
+      sf:false, explor:false,
+      guerre:'', animaux:false, disney:false, horreur:false, enfants:false,
+      famille:false, histoire:false, autres:false,
+      fernandel:false, defunes:false, costagavras:false, chaplin:false, documentaire:false,
       nomcle:''
     });
     saveLocal();
@@ -1112,19 +1222,6 @@ document.addEventListener('DOMContentLoaded', ()=>{
     return null;
   }
 
-  // normalisation en-têtes CSV
-  function norm(s){
-    return String(s||'')
-      .normalize("NFD")
-      .replace(/[\u0300-\u036f]/g,"")           // accents
-      .replace(/[\u2010-\u2015\u2212\u00ad\-]/g,"-") // tirets exotiques -> "-"
-      .replace(/[^\w\- ]+/g," ")                // autres symboles -> espace
-      .toLowerCase()
-      .replace(/\s+/g," ")
-      .trim();
-  }
-
-  // détecter ; , \t |
   function detectDelimiter(sample){
     const line=(sample.split(/\r?\n/)[0]||sample);
     const candidates=[';',',','\t','|'];
@@ -1136,7 +1233,7 @@ document.addEventListener('DOMContentLoaded', ()=>{
     return best;
   }
 
-  // parse CSV corrigé pour conserver la dernière colonne
+  // parse CSV avec dernière cellule
   function parseCSV(text, delim) {
     const out = [];
     let row = [];
@@ -1169,15 +1266,13 @@ document.addEventListener('DOMContentLoaded', ()=>{
           row = [];
           cur = '';
         } else if (c === '\r') {
-          // ignore \r
+          // ignore
         } else {
           cur += c;
         }
       }
     }
 
-    // <-- CORRECTION IMPORTANTE -->
-    // On pousse la dernière cellule + ligne même s'il n'y a pas de ; ou \n final
     if (cur !== '' || row.length) {
       row.push(cur);
     }
@@ -1188,7 +1283,7 @@ document.addEventListener('DOMContentLoaded', ()=>{
     return out;
   }
 
-  /* ===== LANCEMENT ===== */
+  /* ===== démarrage ===== */
   buildHeader();
   initFilters();
   render();
