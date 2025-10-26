@@ -416,7 +416,7 @@ td.sticky-title{
       <span id="filmCount">0</span>
     </h1>
     <div class="header-meta">
-      © Pierre Charlier 2025 • v2.2.6f
+      © Pierre Charlier 2025 • v2.2.6g (Nomcle)
     </div>
 
     <div class="toolbar">
@@ -471,7 +471,7 @@ td.sticky-title{
 
 <script>
 document.addEventListener('DOMContentLoaded', ()=>{
-  const APP_VERSION='2.2.6f';
+  const APP_VERSION='2.2.6g';
   const STORAGE_KEY='dvd_collection_v2';
   const LOCK_KEY='dvd_locked';
 
@@ -481,6 +481,7 @@ document.addEventListener('DOMContentLoaded', ()=>{
   const btnLock=byId('btnLock');
   const filmCount=byId('filmCount');
 
+  // IMPORTANT : Nomcle sans tiret ni accent
   const Columns=[
    {key:'numero',label:'Nº',type:'number',sticky:'num',sortable:true},
    {key:'titre',label:'Titre',type:'text',sticky:'title',sortable:true},
@@ -498,7 +499,7 @@ document.addEventListener('DOMContentLoaded', ()=>{
    {key:'famille',label:'Famille',type:'bool',sortable:true},
    {key:'histoire',label:'Histoire',type:'bool',sortable:true},
    {key:'autres',label:'Autres',type:'bool',sortable:true},
-   {key:'nomcle',label:'Nom-clé',type:'text',sortable:true},
+   {key:'nomcle',label:'Nomcle',type:'text',sortable:true},
    {key:'_actions',label:'',type:'actions',sortable:false}
   ];
 
@@ -642,20 +643,13 @@ document.addEventListener('DOMContentLoaded', ()=>{
 
   /* ===== Rendu du tableau ===== */
   function render(){
-    // indexer pour conserver l'index réel
     const indexed = rows.map((r,i)=>({ ...r, _idx:i }));
-
-    // filtrer
     const filtered = applyFilterIndexed(indexed);
-
-    // trier
     const sortCol = Columns.find(c=>c.key===sortState.key) || Columns[0];
     filtered.sort((a,b)=> (cmp(a,b,sortCol)) * (sortState.dir==='asc'?1:-1));
 
-    // vider tbody
     tbody.innerHTML='';
 
-    // remplir
     filtered.forEach(r=>{
       const tr=document.createElement('tr');
 
@@ -752,7 +746,6 @@ document.addEventListener('DOMContentLoaded', ()=>{
       tbody.appendChild(tr);
     });
 
-    // compteurs
     byId('countShown').textContent=filtered.length;
     byId('countTotal').textContent=rows.length;
     filmCount.textContent=rows.length;
@@ -837,7 +830,7 @@ document.addEventListener('DOMContentLoaded', ()=>{
     });
   }
 
-  /* ===== IMPORT CSV (avec détection robuste Nom-clé) ===== */
+  /* ===== IMPORT CSV ===== */
   byId('fileInput').addEventListener('change', e=>{
     const f=e.target.files?.[0];
     if(!f) return;
@@ -869,9 +862,9 @@ document.addEventListener('DOMContentLoaded', ()=>{
         else if(n.includes('histo')) map[i]='histoire';
         else if(n.includes('autres')||n==='autre'||n==='other'||n==='misc') map[i]='autres';
         else if(
+          n.includes('nomcle') ||
           n.includes('nom cle') ||
           n.includes('nom-cle') ||
-          n.includes('nomcle') ||
           n.includes('nom clé') ||
           n.includes('nom-clé') ||
           n.includes('keywords') ||
@@ -912,7 +905,7 @@ document.addEventListener('DOMContentLoaded', ()=>{
           return o;
         });
 
-      // donner un numéro aux lignes qui ont un Nº vide
+      // donner un numéro si vide
       let max=rows.reduce((m,r)=>Math.max(m,parseInt(r.numero||0,10)||0),0);
       rows.forEach(r=>{
         if(!r.numero){
@@ -928,7 +921,7 @@ document.addEventListener('DOMContentLoaded', ()=>{
     });
   });
 
-  /* ===== EXPORT CSV (ouvre dans nouvel onglet pour sauvegarder où tu veux) ===== */
+  /* ===== EXPORT CSV (simple, même comportement qu'avant) ===== */
   byId('btnExport').addEventListener('click', ()=>{
     if(!rows.length){
       toast('Aucune donnée à exporter');
@@ -938,7 +931,7 @@ document.addEventListener('DOMContentLoaded', ()=>{
     const header = [
       "Nº","Titre","Voyage","Aviation","Animation","Aventure","S.Fiction",
       "Exploration","Guerre","Animaux","Disney","Horreur",
-      "Enfants","Famille","Histoire","Autres","Nom-clé"
+      "Enfants","Famille","Histoire","Autres","Nomcle"
     ];
 
     const lines=[header.join(';')];
@@ -969,11 +962,16 @@ document.addEventListener('DOMContentLoaded', ()=>{
     const blob=new Blob([lines.join('\n')], {type:'text/csv;charset=utf-8;'});
     const url = URL.createObjectURL(blob);
 
-    // Ouvre dans un nouvel onglet.
-    // Sur iPhone : bouton Partager → Enregistrer dans Fichiers → choisis ton dossier.
-    window.open(url, "_blank");
+    // On garde le téléchargement "classique"
+    const a=document.createElement('a');
+    a.href=url;
+    a.download='DVD_export.csv';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
 
-    toast('CSV prêt. Partager → Enregistrer dans Fichiers');
+    toast('CSV exporté');
   });
 
   /* ===== AJOUTER / TOUT EFFACER ===== */
@@ -1116,13 +1114,13 @@ document.addEventListener('DOMContentLoaded', ()=>{
     return null;
   }
 
-  // version renforcée : retire accents, unifie tirets, nettoie
   function norm(s){
+    // normalisation robuste, mais maintenant on vise 'Nomcle' simple
     return String(s||'')
-      .normalize("NFD")                         // sépare lettres et accents
-      .replace(/[\u0300-\u036f]/g,"")           // enlève les accents (é -> e)
-      .replace(/[\u2010-\u2015\u2212\u00ad\-]/g,"-") // tous types de tirets → "-"
-      .replace(/[^\w\- ]+/g," ")                // autres symboles → espace
+      .normalize("NFD")
+      .replace(/[\u0300-\u036f]/g,"")           // accents
+      .replace(/[\u2010-\u2015\u2212\u00ad\-]/g,"-") // tirets exotiques -> "-"
+      .replace(/[^\w\- ]+/g," ")                // autres symboles -> espace
       .toLowerCase()
       .replace(/\s+/g," ")
       .trim();
