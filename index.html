@@ -362,7 +362,7 @@ td.sticky-title{
   border:1px solid #86efac;
   padding:10px 14px;
   border-radius:8px;
-  box-shadow:var(--shadow);
+  box-shadow:0 4px 16px rgba(0,0,0,.1);
   opacity:0;
   transition:opacity .2s ease;
   z-index:99;
@@ -416,7 +416,7 @@ td.sticky-title{
       <span id="filmCount">0</span>
     </h1>
     <div class="header-meta">
-      © Pierre Charlier 2025 • v2.2.6g (Nomcle)
+      © Pierre Charlier 2025 • v3.0
     </div>
 
     <div class="toolbar">
@@ -471,7 +471,7 @@ td.sticky-title{
 
 <script>
 document.addEventListener('DOMContentLoaded', ()=>{
-  const APP_VERSION='2.2.6g';
+  const APP_VERSION='3.0';
   const STORAGE_KEY='dvd_collection_v2';
   const LOCK_KEY='dvd_locked';
 
@@ -481,7 +481,7 @@ document.addEventListener('DOMContentLoaded', ()=>{
   const btnLock=byId('btnLock');
   const filmCount=byId('filmCount');
 
-  // IMPORTANT : Nomcle sans tiret ni accent
+  // Colonnes, avec Nomcle sans tiret ni accent
   const Columns=[
    {key:'numero',label:'Nº',type:'number',sticky:'num',sortable:true},
    {key:'titre',label:'Titre',type:'text',sticky:'title',sortable:true},
@@ -503,7 +503,7 @@ document.addEventListener('DOMContentLoaded', ()=>{
    {key:'_actions',label:'',type:'actions',sortable:false}
   ];
 
-  // Charger les données sauvegardées
+  // Chargement local
   let rows = loadLocal();
   if(!rows || !Array.isArray(rows) || !rows.length){
     rows=[
@@ -515,7 +515,7 @@ document.addEventListener('DOMContentLoaded', ()=>{
     saveLocal();
   }
 
-  // Tri + filtre + verrou
+  // Tri / filtre / verrou
   let sortState={ key:'numero', dir:'asc' };
   let guerreFilter='ALL';
   let locked = loadLockedState();
@@ -611,7 +611,7 @@ document.addEventListener('DOMContentLoaded', ()=>{
     return false;
   }
 
-  /* ===== Filtre Guerre ===== */
+  /* ===== Filtres WW1/WW2/etc ===== */
   function initFilters(){
     document.querySelectorAll('#guerreFilters .chipbtn').forEach(b=>{
       b.addEventListener('click', ()=>{
@@ -632,7 +632,6 @@ document.addEventListener('DOMContentLoaded', ()=>{
     });
   }
 
-  /* Pastille Guerre */
   function setBadge(el, val){
     el.textContent = val || '—';
     el.className='badge';
@@ -905,7 +904,7 @@ document.addEventListener('DOMContentLoaded', ()=>{
           return o;
         });
 
-      // donner un numéro si vide
+      // Nº auto si vide
       let max=rows.reduce((m,r)=>Math.max(m,parseInt(r.numero||0,10)||0),0);
       rows.forEach(r=>{
         if(!r.numero){
@@ -921,7 +920,7 @@ document.addEventListener('DOMContentLoaded', ()=>{
     });
   });
 
-  /* ===== EXPORT CSV (simple, même comportement qu'avant) ===== */
+  /* ===== EXPORT CSV ===== */
   byId('btnExport').addEventListener('click', ()=>{
     if(!rows.length){
       toast('Aucune donnée à exporter');
@@ -962,7 +961,6 @@ document.addEventListener('DOMContentLoaded', ()=>{
     const blob=new Blob([lines.join('\n')], {type:'text/csv;charset=utf-8;'});
     const url = URL.createObjectURL(blob);
 
-    // On garde le téléchargement "classique"
     const a=document.createElement('a');
     a.href=url;
     a.download='DVD_export.csv';
@@ -1114,8 +1112,8 @@ document.addEventListener('DOMContentLoaded', ()=>{
     return null;
   }
 
+  // normalisation en-têtes CSV
   function norm(s){
-    // normalisation robuste, mais maintenant on vise 'Nomcle' simple
     return String(s||'')
       .normalize("NFD")
       .replace(/[\u0300-\u036f]/g,"")           // accents
@@ -1126,6 +1124,7 @@ document.addEventListener('DOMContentLoaded', ()=>{
       .trim();
   }
 
+  // détecter ; , \t |
   function detectDelimiter(sample){
     const line=(sample.split(/\r?\n/)[0]||sample);
     const candidates=[';',',','\t','|'];
@@ -1137,30 +1136,55 @@ document.addEventListener('DOMContentLoaded', ()=>{
     return best;
   }
 
-  function parseCSV(text,delim){
-    const out=[];
-    let row=[];
-    let cur='';
-    let inQ=false;
-    for(let i=0;i<text.length;i++){
-      const c=text[i];
-      if(inQ){
-        if(c=='"'){
-          if(text[i+1]=='"'){ cur+='"'; i++; }
-          else inQ=false;
+  // parse CSV corrigé pour conserver la dernière colonne
+  function parseCSV(text, delim) {
+    const out = [];
+    let row = [];
+    let cur = '';
+    let inQ = false;
+
+    for (let i = 0; i < text.length; i++) {
+      const c = text[i];
+
+      if (inQ) {
+        if (c === '"') {
+          if (text[i + 1] === '"') {
+            cur += '"';
+            i++;
+          } else {
+            inQ = false;
+          }
         } else {
-          cur+=c;
+          cur += c;
         }
-      }else{
-        if(c=='"'){ inQ=true; }
-        else if(c===delim){ row.push(cur); cur=''; }
-        else if(c=='\n'){ row.push(cur); out.push(row); row=[]; cur=''; }
-        else if(c=='\r'){ /* ignore */ }
-        else { cur+=c; }
+      } else {
+        if (c === '"') {
+          inQ = true;
+        } else if (c === delim) {
+          row.push(cur);
+          cur = '';
+        } else if (c === '\n') {
+          row.push(cur);
+          out.push(row);
+          row = [];
+          cur = '';
+        } else if (c === '\r') {
+          // ignore \r
+        } else {
+          cur += c;
+        }
       }
     }
-    if(cur!=='' || text.endsWith(delim)) row.push(cur);
-    if(row.length) out.push(row);
+
+    // <-- CORRECTION IMPORTANTE -->
+    // On pousse la dernière cellule + ligne même s'il n'y a pas de ; ou \n final
+    if (cur !== '' || row.length) {
+      row.push(cur);
+    }
+    if (row.length) {
+      out.push(row);
+    }
+
     return out;
   }
 
